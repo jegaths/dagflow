@@ -85,7 +85,7 @@ class FunctionFinder(Finder):
 
 
 
-source_path = "../dags/test.py"
+source_path = "./dags/test.py"
 
 serializer = Serializer()
 serializer.finders.add(ImportFinder(name="import_finder"))
