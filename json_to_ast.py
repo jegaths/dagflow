@@ -1,5 +1,7 @@
 import json
 
+from ast import *
+
 with open("./ast.json", "r") as f:
     data = json.load(f)
 
@@ -37,18 +39,18 @@ def create_node(node):
 for node in data["body"]:
     create_node(node)
     lst.append("]")
+    lst.append('type_ignores=[]')
     lst.append(END_BRACKET)
-    break
+    # break
 
 
-ast_str = "from ast import *\n"
+# ast_str = "from ast import *\n"
+ast_str = "".join([f'{line}\n' if line[-1] in (START_BRACKET,"[") else f'{line},\n' for line in lst])
 
-with open('demofile2.py','w') as tfile:
-    tfile.write("from ast import *\n")
-    ast_str += "".join([f'{line}\n' if line[-1] in (START_BRACKET,"[") else f'{line},\n' for line in lst])
-    [tfile.write(f'{line}\n' if line[-1] in (START_BRACKET,"[") else f'{line},\n') for line in lst]
-        # f.write(f'{data[item]}()')
 
-print(ast_str)
+# with open('demofile2.py','w') as tfile:
+#     # tfile.write("from ast import *\n")
+#     [tfile.write(f'{line}\n' if line[-1] in (START_BRACKET,"[") else f'{line},\n') for line in lst]
 
-# f.close()
+#Convert ast to source code
+# print(unparse(eval(ast_str)[0]))
