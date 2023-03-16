@@ -1,0 +1,23 @@
+from ast import *
+Module(
+body=[
+ImportFrom(
+col_offset=0,
+end_col_offset=23,
+end_lineno=1,
+level=0,
+lineno=1,
+module='airflow',
+names=[
+alias(
+asname=None,
+col_offset=20,
+end_col_offset=23,
+end_lineno=1,
+lineno=1,
+name='DAG',
+),
+],
+),
+],
+),
