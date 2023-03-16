@@ -14,6 +14,7 @@ APPEND_TYPES = (int,type(None))
 
 lst = ["Module"+START_BRACKET,"body=["]
 
+
 def create_node(node):
     for key in node.keys():
         if(key == "_type"):
@@ -27,8 +28,12 @@ def create_node(node):
                 lst.append(f'{key}=[')
                 [create_node(x) for x in node[key]]
                 lst.append(']')
+            elif(isinstance(node[key],dict)):
+                lst.append(f'value=')
+                # create_node(node)
+                #TODO cannot call create_node again, maximum recursion depth exceeded
             else:
-                print(f"Unidentified key ==> {key} and node ==> {node[key]}")
+                print(f"Unidentified instance ==> {type(node[key])} key ==> {key} and node ==> {node[key]}")
                 
     lst.append(END_BRACKET)
 
@@ -43,9 +48,10 @@ for node in data["body"]:
     lst.append(END_BRACKET)
     # break
 
+# print(lst)
 
 # ast_str = "from ast import *\n"
-ast_str = "".join([f'{line}\n' if line[-1] in (START_BRACKET,"[") else f'{line},\n' for line in lst])
+# ast_str = "".join([f'{line}\n' if line[-1] in (START_BRACKET,"[") else f'{line},\n' for line in lst])
 
 
 # with open('demofile2.py','w') as tfile:
