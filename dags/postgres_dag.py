@@ -44,7 +44,7 @@ dag = DAG(
         'owner': 'Jegath S',
         'depends_on_past': True,
         'start_date': days_ago(1),
-        'email': ['jegath.suresh@grandvision.com'],
+        'email': ['myemail.com'],
         'email_on_failure': False,
         'email_on_retry': False,
         'retries': 3,
@@ -59,7 +59,7 @@ dag = DAG(
 )
 get_entities = GvPostgresOperator(
     dag=dag,
-    postgres_conn_id="postges_developer_hub_dev",
+    postgres_conn_id="my_connection_id",
     task_id="get_entities",
     sql="SELECT entity_name,is_enabled FROM entities",
     mode="read"
