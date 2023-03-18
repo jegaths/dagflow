@@ -9,18 +9,25 @@ class ASTToJson:
     __BUILTIN_BYTES = (bytearray, bytes)
     __BUILTIN_STR = (str)
 
-    def __init__(self,file_path: str) -> None:
-        with open(file_path, "r") as f:
-            tree = parse(f.read())
-        # with open("sample_ast.py", 'w', encoding='utf-8') as f:
-        #     f.write(dump(tree, include_attributes=True,indent=4))
-        self.__ast_dict = self.__to_json(tree)
+    def __init__(self,file_path: str = None, python_code_string: str = None) -> None:
+        if(file_path == None and python_code_string == None):
+            print("Filepath or python string should be given!")
+            return
+        if(python_code_string == None):
+            with open(file_path, "r") as f:
+                tree = parse(f.read())
+            # with open("sample_ast.py", 'w', encoding='utf-8') as f:
+            #     f.write(dump(tree, include_attributes=True,indent=4))
+            self.__ast_dict = self.__to_json(tree)
+        else:
+            tree = parse(python_code_string)
+            self.__ast_dict = self.__to_json(tree)
 
     def __to_json(self,node):
         node_details = dict()
         node_details['_type'] = node.__class__.__name__
         for attr in dir(node):
-            if attr.startswith("_"):
+            if attr.startswith("_") or attr in ['n','s']:
                 continue
             node_details[attr] = self.__get_value(getattr(node, attr))
         return node_details
@@ -54,8 +61,11 @@ class ASTToJson:
         except:
             return codecs.getencoder('hex_codec')(value)[0].decode('utf-8')  
 
-    def json(self):
+    def json_str(self):
         return json.dumps(self.__ast_dict,indent=4)
+
+    def get(self) -> dict:
+        return self.__ast_dict
 
     def save(self,file_path: str):
         with open(file_path, 'w', encoding='utf-8') as f:

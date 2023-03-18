@@ -162,3 +162,5 @@ cython_debug/
 
 ast.json
 sample_ast.py
+*.ipynb
+test.py
