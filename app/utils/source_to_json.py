@@ -2,7 +2,7 @@ from _ast import AST
 from ast import parse
 import codecs
 import json
-from dagflow_logger import Logger
+from utils.custom_logger import Logger
 
 
 
