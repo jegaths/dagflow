@@ -37,25 +37,52 @@ class Item(BaseModel):
 @app.post("/run_pipeline")
 def run_pipeline(data: Item):
     data = data.data
-    python_str = f"""from {data['import_path']} import {data['name']}
+    import_str = ""
+    arg_str = ""
+    for key in data["operators"]:
+        operator = data["operators"][key]
+        import_str += f"""from {operator['import_path']} import {operator['name']}
 """
-    if ("global" in data["args"].keys()):
-        python_str += f"""{data["args"]["global"]["default_argument"]}
+        python_str = f"""{operator['name']}("""
+        for k, v in operator["args"].items():
+            if (v != ""):
+                python_str += f"""{k} = {v},""" if k == "python_callable" else f"""{k} = '{v}',"""
+        # * Adding dag as an argument
+        python_str += f"""dag = dag"""
+        python_str += """)\n"""
+        # * Adding to main arg_str with a operator variable
+        arg_str += f'{key} = {python_str}'
+
+    global_str = ""
+    if (data['global'] != ""):
+        global_str += f"""{data["global"]}
 """
-    python_str += f"""{data['name']}("""
-    for k, v in data["args"].items():
-        if (v["default_argument"] != ""):
-            if (k == "global"):
-                continue
-            python_str += f"""{k} = {v["default_argument"]},"""
-    python_str += f""")"""
-    print(python_str)
-    obj = SourceToJson(python_code_string=python_str).get()
+
+    main_str = import_str + global_str + arg_str
+    obj = SourceToJson(python_code_string=main_str).get()
     with open("./utils/base_dag_json.json", "r") as f:
         base_json = json.load(f)
-
     base_json['body'].extend(obj['body'])
     print(JsonToSource(json_string=json.dumps(base_json, indent=4)).save("generated_dag.py"))
+
+
+#     if ("global" in data["args"].keys()):
+#         python_str += f"""{data["args"]["global"]["default_argument"]}
+# """
+#     python_str += f"""{data['name']}("""
+    # for k, v in data["args"].items():
+    #     if (v["default_argument"] != ""):
+    #         if (k == "global"):
+    #             continue
+    #         python_str += f"""{k} = {v["default_argument"]},"""
+    # python_str += f""")"""
+#     print(python_str)
+#     obj = SourceToJson(python_code_string=python_str).get()
+#     with open("./utils/base_dag_json.json", "r") as f:
+#         base_json = json.load(f)
+
+#     base_json['body'].extend(obj['body'])
+#     print(JsonToSource(json_string=json.dumps(base_json, indent=4)).save("generated_dag.py"))
 
     # print(data)
     # python_callable = data["python_callable"]
