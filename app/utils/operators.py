@@ -13,7 +13,7 @@ def import_from(filename, functionName):
 def get_default_args(func) -> dict:
     signature = inspect.signature(func)
     return {
-        k: {"default_argument": v.default if v.default is not inspect.Parameter.empty else "No default argument",
+        k: {"default_argument": str(v.default) if v.default is not inspect.Parameter.empty and v.default != None else "",
             "data_type": str(v.annotation) if v.annotation is not inspect.Parameter.empty else "No datatype specified"}
         for k, v in signature.parameters.items() if k not in ["self"]
     }
@@ -26,11 +26,13 @@ def get_operators() -> dict:
         imported_operator = import_from(
             ALLOWED_OPERATORS[operator][1], operator,)
         operator_info = get_default_args(imported_operator.__init__)
+        operator_info["task_id"] = {"default_argument": "","data_type":"string"}
         operator_details["args"] = operator_info
         operator_details["name"] = operator
         operator_details["description"] = f"{operator} description."
         operator_details["node_type"] = "operator"
         operator_details["id"] = ALLOWED_OPERATORS[operator][0]
+        operator_details["import_path"] = ALLOWED_OPERATORS[operator][1]
         operators.append(operator_details)
 
     return operators
