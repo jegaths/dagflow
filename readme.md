@@ -2,6 +2,22 @@
 
 A UI for creating and managing airflow dags.
 
+### How to run ?
+
+```docker
+#Build the image
+docker build -t dagflow-api-image .
+
+#Run the image
+docker run --name dagflow-api -p 8000:8000 -d -v $(pwd)/app:/app dagflow-api-image
+
+#To see logs
+docker logs dagflow-api
+```
+
+# docker build -t dagflow-api-image .
+#docker logs dagflow-api
+
 
 <details>
 <summary><b>Sample AST JSON for test.py</b></summary>
