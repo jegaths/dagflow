@@ -34,15 +34,18 @@ class Item(BaseModel):
     data: dict
 
 
-@app.post("/run_pipeline")
-def run_pipeline(data: Item):
+@app.post("/generate_dag")
+def generate_dag(data: Item):
     data = data.data
-    import_str = ""
+    # Variable to store import statements
+    import_str = []
+    # Variable to store operators
     arg_str = ""
     for key in data["operators"]:
         operator = data["operators"][key]
-        import_str += f"""from {operator['import_path']} import {operator['name']}
-"""
+        import_str.append(f"""from {operator['import_path']} import {operator['name']}
+""")
+        # Variable to store operator arguments
         python_str = f"""{operator['name']}("""
         for k, v in operator["args"].items():
             if (v != ""):
@@ -53,45 +56,23 @@ def run_pipeline(data: Item):
         # * Adding to main arg_str with a operator variable
         arg_str += f'{key} = {python_str}'
 
+    # Variable to store global statements and args
     global_str = ""
     if (data['global'] != ""):
         global_str += f"""{data["global"]}
 """
 
-    main_str = import_str + global_str + arg_str
+    # Combining all the strings
+    main_str = "".join(list(set(import_str))) + global_str + arg_str
+    # Converting the python string to json
     obj = SourceToJson(python_code_string=main_str).get()
+    # Loading the base dag json with default statements
     with open("./utils/base_dag_json.json", "r") as f:
         base_json = json.load(f)
+    # Extending base json with the created json
     base_json['body'].extend(obj['body'])
-    print(JsonToSource(json_string=json.dumps(base_json, indent=4)).save("generated_dag.py"))
-
-
-#     if ("global" in data["args"].keys()):
-#         python_str += f"""{data["args"]["global"]["default_argument"]}
-# """
-#     python_str += f"""{data['name']}("""
-    # for k, v in data["args"].items():
-    #     if (v["default_argument"] != ""):
-    #         if (k == "global"):
-    #             continue
-    #         python_str += f"""{k} = {v["default_argument"]},"""
-    # python_str += f""")"""
-#     print(python_str)
-#     obj = SourceToJson(python_code_string=python_str).get()
-#     with open("./utils/base_dag_json.json", "r") as f:
-#         base_json = json.load(f)
-
-#     base_json['body'].extend(obj['body'])
-#     print(JsonToSource(json_string=json.dumps(base_json, indent=4)).save("generated_dag.py"))
-
-    # print(data)
-    # python_callable = data["python_callable"]
-    # obj = SourceToJson(python_code_string=python_callable).get()
-
-    # base_last_line_number = 22
-    # obj['body'][0]["lineno"] += base_last_line_number
-    # obj['body'][0]["end_lineno"] += base_last_line_number
-
+    # Converting the json back to python source code and saving as a file
+    JsonToSource(json_string=json.dumps(base_json, indent=4)).save("generated_dag.py")
     return {"status": True}
 
 

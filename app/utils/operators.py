@@ -26,10 +26,9 @@ def get_operators() -> dict:
         imported_operator = import_from(
             ALLOWED_OPERATORS[operator][1], operator,)
         operator_info = get_default_args(imported_operator.__init__)
-        operator_info["task_id"] = {"default_argument": "","data_type":"string"}
+        operator_info["task_id"] = {"default_argument": "", "data_type": "string"}
         operator_details["args"] = operator_info
         operator_details["name"] = operator
-        operator_details["description"] = f"{operator} description."
         operator_details["node_type"] = "operator"
         operator_details["id"] = ALLOWED_OPERATORS[operator][0]
         operator_details["import_path"] = ALLOWED_OPERATORS[operator][1]
