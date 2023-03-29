@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from utils.operators import get_operators
+from utils.generate_source_string import GenerateSourceString
 import uvicorn
 from pydantic import BaseModel
 from utils.source_to_json import SourceToJson
 from utils.json_to_source import JsonToSource
 import json
+from collections import defaultdict
 
 origins = ["*"]
 
@@ -34,37 +36,51 @@ class Item(BaseModel):
     data: dict
 
 
+def get_relation(root_node, edges, relation):
+    for edge in edges:
+        if (edge["source"] == root_node):
+            relation[edge["target"]] = {}
+            get_relation(edge["target"], edges, relation[edge["target"]])
+
+
 @app.post("/generate_dag")
 def generate_dag(data: Item):
     data = data.data
-    # Variable to store import statements
-    import_str = []
-    # Variable to store operators
-    arg_str = ""
-    for key in data["operators"]:
-        operator = data["operators"][key]
-        import_str.append(f"""from {operator['import_path']} import {operator['name']}
-""")
-        # Variable to store operator arguments
-        python_str = f"""{operator['name']}("""
-        for k, v in operator["args"].items():
-            if (v != ""):
-                python_str += f"""{k} = {v},""" if k == "python_callable" else f"""{k} = '{v}',"""
-        # * Adding dag as an argument
-        python_str += f"""dag = dag"""
-        python_str += """)\n"""
-        # * Adding to main arg_str with a operator variable
-        arg_str += f'{key} = {python_str}'
 
-    # Variable to store global statements and args
-    global_str = ""
-    if (data['global'] != ""):
-        global_str += f"""{data["global"]}
-"""
+    edges = data["react_flow_data"]["edges"]
 
-    # Combining all the strings
-    main_str = "".join(list(set(import_str))) + global_str + arg_str
-    # Converting the python string to json
+    sources = set()
+    targets = set()
+    for edge in edges:
+        sources.add(edge["source"])
+        targets.add(edge["target"])
+
+    roots = list(sources - targets)
+
+    orphans = list(set(data["operators"].keys()) - set(list(sources) + list(targets)))
+
+    relation = {}
+    for root in roots:
+        relation[root] = {}
+        get_relation(root, edges, relation[root])
+
+    print("*"*100)
+    print(f"Relation =========> {json.dumps(relation, indent=4, sort_keys=True, default=str)}")
+    print(orphans)
+    print("*"*100)
+
+    # print("*"*100)
+    # print(list(targets - sources))
+    # print(f"Targets =========> {targets}")
+    # print(f"Sources =========> {sources}")
+    # print(f"Root =========> {root}")
+    # print("*"*100)
+
+    # print(json.dumps(data, indent=4, sort_keys=True, default=str))
+
+    # Generating the python source code string
+    main_str = GenerateSourceString.get(data)
+    # Converting the python source code string to json
     obj = SourceToJson(python_code_string=main_str).get()
     # Loading the base dag json with default statements
     with open("./utils/base_dag_json.json", "r") as f:
@@ -74,7 +90,3 @@ def generate_dag(data: Item):
     # Converting the json back to python source code and saving as a file
     JsonToSource(json_string=json.dumps(base_json, indent=4)).save("generated_dag.py")
     return {"status": True}
-
-
-# if __name__ == "__main__":
-#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
