@@ -18,7 +18,7 @@ class GenerateSourceString:
                 if (v != ""):
                     operator_args_str += f"""{k} = {v},""" if k == "python_callable" else f"""{k} = '{v}',"""
             operator_args_str += f"""dag = dag)\n"""
-            self.__arg_str += f'{key} = {operator_args_str}'
+            self.__arg_str += f'{operator["args"]["task_id"]} = {operator_args_str}'
 
     def __generate_global_string(self, data: str) -> None:
         if (data != ""):
@@ -37,7 +37,9 @@ class GenerateSourceString:
         if parent_keys is None:
             parent_keys = []
         for key, value in input_dict.items():
-            current_keys = parent_keys + [key]
+            # current_keys = parent_keys + [key]
+            # Adding task_id instead of key to match with the UI
+            current_keys = parent_keys + [self.__data["operators"][key]["args"]["task_id"]]
             if isinstance(value, dict) and value:
                 self.__convert_relation_to_string(value, output_list=output_list, parent_keys=current_keys)
             elif isinstance(value, dict) and not value:
@@ -51,6 +53,8 @@ class GenerateSourceString:
             sources.add(edge["source"])
             targets.add(edge["target"])
         roots = list(sources - targets)
+
+        # orphans - With no source and target
         orphans = list(set(operators.keys()) - set(list(sources) + list(targets)))
 
         relation = {}
@@ -58,7 +62,8 @@ class GenerateSourceString:
             relation[root] = {}
             self.__get_relation(root, edges, relation[root])
 
-        orphans = "\n".join(orphans)
+        # Adding task_id instead of key for the orphans to match with the UI
+        orphans = "\n".join([self.__data["operators"][x]["args"]["task_id"] for x in orphans])
         self.__relation_str = self.__convert_relation_to_string(relation) + f"\n{orphans}"
 
     def get(self) -> str:
