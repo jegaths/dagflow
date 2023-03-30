@@ -9,7 +9,7 @@ A UI for creating and managing airflow dags.
 docker build -t dagflow-api-image .
 
 #Run the image
-docker run --name dagflow-api -p 8000:8000 -d -v $(pwd)/app:/app dagflow-api-image
+docker run --name dagflow-api -p 8000:8000 -d -v $(pwd)/app:/app -v /mnt/c/Users/Jegath/Documents/Work/Grandvision/docker-airflow-2.1.4/dags:/dags dagflow-api-image
 
 #To see logs
 docker logs dagflow-api
