@@ -23,12 +23,12 @@ app.add_middleware(
 
 
 @app.get("/")
-def get_operatords():
+def root():
     return "Dagflow!"
 
 
 @app.get("/operators")
-def get_operatords():
+def get_operator_list():
     return get_operators()
 
 
@@ -36,50 +36,11 @@ class Item(BaseModel):
     data: dict
 
 
-def get_relation(root_node, edges, relation):
-    for edge in edges:
-        if (edge["source"] == root_node):
-            relation[edge["target"]] = {}
-            get_relation(edge["target"], edges, relation[edge["target"]])
-
-
 @app.post("/generate_dag")
 def generate_dag(data: Item):
     data = data.data
-
-    edges = data["react_flow_data"]["edges"]
-
-    sources = set()
-    targets = set()
-    for edge in edges:
-        sources.add(edge["source"])
-        targets.add(edge["target"])
-
-    roots = list(sources - targets)
-
-    orphans = list(set(data["operators"].keys()) - set(list(sources) + list(targets)))
-
-    relation = {}
-    for root in roots:
-        relation[root] = {}
-        get_relation(root, edges, relation[root])
-
-    print("*"*100)
-    print(f"Relation =========> {json.dumps(relation, indent=4, sort_keys=True, default=str)}")
-    print(orphans)
-    print("*"*100)
-
-    # print("*"*100)
-    # print(list(targets - sources))
-    # print(f"Targets =========> {targets}")
-    # print(f"Sources =========> {sources}")
-    # print(f"Root =========> {root}")
-    # print("*"*100)
-
-    # print(json.dumps(data, indent=4, sort_keys=True, default=str))
-
     # Generating the python source code string
-    main_str = GenerateSourceString.get(data)
+    main_str = GenerateSourceString(data).get()
     # Converting the python source code string to json
     obj = SourceToJson(python_code_string=main_str).get()
     # Loading the base dag json with default statements
@@ -88,5 +49,5 @@ def generate_dag(data: Item):
     # Extending base json with the created json
     base_json['body'].extend(obj['body'])
     # Converting the json back to python source code and saving as a file
-    JsonToSource(json_string=json.dumps(base_json, indent=4)).save("generated_dag.py")
+    JsonToSource(json_string=json.dumps(base_json, indent=4)).save("/dags/generated_dag.py")
     return {"status": True}
