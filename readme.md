@@ -1,5 +1,13 @@
 # Dagflow
+# To run in dev mode
 
+```bash
+#Install dependencies
+npm i
+
+#Run dev server
+npm run dev
+```
 A UI for creating and managing airflow dags.
 
 ### How to run ?
