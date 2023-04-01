@@ -1,18 +1,22 @@
 import React from "react";
-// import Canvas from "./components/Canvas/Canvas";
 import Pipeline from "./components/Pipeline/Pipeline";
-import Details from "./components/Pipeline/Details";
+import Homepage from "./components/Homepage/Homepage";
 import Sidebar from "./components/Sidebar/Sidebar"
 import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 export default function App() {
     return (
         <>
+            <ToastContainer />
             <div className="flex font-display justify-between">
                 <Sidebar />
-                <Pipeline />
-                {/* <Details /> */}
+                <Homepage />
+
+                {/* <Pipeline /> */}
+
             </div>
+
         </>
 
     );

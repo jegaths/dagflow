@@ -4,7 +4,6 @@ import { pipelineState, reactFlowState } from './atoms'
 import { useRecoilValue } from 'recoil'
 import { savePipeline, generate_dag } from './utils'
 import Details from './Details'
-import { ToastContainer } from 'react-toastify';
 
 
 const Pipeline = () => {
@@ -13,7 +12,6 @@ const Pipeline = () => {
     const rectFlowInstance = useRecoilValue(reactFlowState)
     return (
         <div className='w-full relative flex'>
-            <ToastContainer />
             <div className='mt-4 mx-10 w-full flex flex-col gap-6'>
                 <div className='flex justify-between'>
                     <span className="text-4xl font-medium">first pipeline</span>

@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from utils.operators import get_operators
 from utils.generate_source_string import GenerateSourceString
+from utils.dag_to_dagflow import DagToDagFlow
 import uvicorn
 from pydantic import BaseModel
 from utils.source_to_json import SourceToJson
@@ -51,3 +52,11 @@ def generate_dag(data: Item):
     # Converting the json back to python source code and saving as a file
     JsonToSource(json_string=json.dumps(base_json, indent=4)).save("/dags/generated_dag.py")
     return {"status": True}
+
+
+@app.post("/generate_flow")
+def generate_flow(file: UploadFile):
+    # SourceToJson(python_code_string=file.file.read().decode("utf-8")).save("source_to_json.json")
+    data = SourceToJson(python_code_string=file.file.read().decode("utf-8")).json_str()
+    DagToDagFlow(json_string=data)
+    # print(file.file.read())
