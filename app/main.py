@@ -58,4 +58,5 @@ def generate_flow(file: UploadFile):
     # SourceToJson(python_code_string=file.file.read().decode("utf-8")).save("source_to_json.json")
     data = SourceToJson(python_code_string=file.file.read().decode("utf-8")).json_str()
     dagflow = DagToDagFlow(json_string=data).get()
-    print(json.dumps(dagflow, indent=4))
+    return dagflow
+    # print(json.dumps(dagflow, indent=4))
