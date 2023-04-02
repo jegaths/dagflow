@@ -12,9 +12,9 @@ export default function App() {
       <div className="flex font-display justify-between">
         <Sidebar />
 
-        <Homepage />
+        {/* <Homepage /> */}
 
-        {/* <Pipeline /> */}
+        <Pipeline />
       </div>
     </>
   );

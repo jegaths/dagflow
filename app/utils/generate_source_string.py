@@ -1,33 +1,43 @@
 class GenerateSourceString:
-
     def __init__(self, data: dict):
         self.__data = data
-        self.__import_str = set()
+        self.__import_str = ""
         self.__arg_str = ""
         self.__global_str = ""
         self.__relation_str = ""
+        self.__dag_str = ""
 
-    def __generate_import_and_operator_statements(self, operators: dict) -> list:
+    def __generate_operator_statements(self, operators: dict) -> list:
         for key in operators:
             operator = operators[key]
-            self.__import_str.add(f"""from {operator['import_path']} import {operator['name']}
-""")
+            #             self.__import_str.add(f"""from {operator['import_path']} import {operator['name']}
+            # """)
             # Variable to store operator arguments
             operator_args_str = f"""{operator['name']}("""
             for k, v in operator["args"].items():
-                if (v != ""):
+                if v != "":
                     operator_args_str += f"""{k} = {v},""" if k == "python_callable" else f"""{k} = '{v}',"""
             operator_args_str += f"""dag = dag)\n"""
             self.__arg_str += f'{operator["args"]["task_id"]} = {operator_args_str}'
 
     def __generate_global_string(self, data: str) -> None:
-        if (data != ""):
+        if data != "":
             self.__global_str += f"""{data}
+"""
+
+    def __generate_import_statements(self, data: str) -> None:
+        if data != "":
+            self.__import_str += f"""{data}
+"""
+
+    def __generate_dag_statement(self, data: str) -> None:
+        if data != "":
+            self.__dag_str += f"""{data}
 """
 
     def __get_relation(self, root_node, edges, relation):
         for edge in edges:
-            if (edge["source"] == root_node):
+            if edge["source"] == root_node:
                 relation[edge["target"]] = {}
                 self.__get_relation(edge["target"], edges, relation[edge["target"]])
 
@@ -68,7 +78,11 @@ class GenerateSourceString:
 
     def get(self) -> str:
         # Calling the functions to generate the source code string
-        self.__generate_import_and_operator_statements(self.__data["operators"])
+        self.__generate_import_statements(self.__data["import_statements"])
+        self.__generate_dag_statement(self.__data["dag_statement"])
+        self.__generate_operator_statements(self.__data["operators"])
         self.__generate_global_string(self.__data["global"])
-        self.__generate_relation_graph_string(self.__data["react_flow_data"]["edges"], operators=self.__data["operators"])
-        return "".join(list(self.__import_str)) + self.__global_str + self.__arg_str + self.__relation_str
+        self.__generate_relation_graph_string(
+            self.__data["react_flow_data"]["edges"], operators=self.__data["operators"]
+        )
+        return self.__import_str + self.__dag_str + self.__global_str + self.__arg_str + self.__relation_str
