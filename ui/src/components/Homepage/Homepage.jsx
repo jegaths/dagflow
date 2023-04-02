@@ -4,11 +4,13 @@ import { BASE_URL } from "../../constants";
 
 import { useSetRecoilState } from "recoil";
 import { initialNodesState, intialEdgesState, pipelineState } from "../Pipeline/atoms";
+import { isCanvasEnabledState } from "../../atoms";
 
 const Homepage = () => {
   const setInitialEdges = useSetRecoilState(intialEdgesState);
   const setInitialNodes = useSetRecoilState(initialNodesState);
   const setPipelineData = useSetRecoilState(pipelineState);
+  const setIsCanvasEnabled = useSetRecoilState(isCanvasEnabledState);
 
   const inputFile = useRef(null);
 
@@ -30,7 +32,6 @@ const Homepage = () => {
         .then((res) => res.json())
         .then((result) => {
           resolve(result);
-          console.log(result);
           setInitialEdges(result.react_flow_data.edges);
           setInitialNodes(result.react_flow_data.nodes);
           setPipelineData((prev) => ({
@@ -39,6 +40,7 @@ const Homepage = () => {
             dag_statement: result.dag_statement,
             pipeline_name: "",
           }));
+          setIsCanvasEnabled(true);
         })
     );
 
@@ -49,19 +51,28 @@ const Homepage = () => {
     });
   };
   return (
-    <div className="w-full relative flex">
+    <div className="w-full relative flex items-center">
       <div className="mt-4 mx-10 w-full flex flex-col gap-6">
-        <div className="flex justify-between">
-          <span className="text-4xl font-medium">Home</span>
+        <div className="flex flex-col">
+          <span className="text-6xl font-bold text-primary tracking-widest">dagflow</span>
+          <span className="mt-8 text-3xl text-muted">Build complex workflows</span>
+          <span className="mt-2 text-3xl text-primary">easily & reliably</span>
+          <span className="mt-8 text-2xl">Import your existing dag to dagflow</span>
           <div>
             <input type="file" ref={inputFile} className="hidden" onChange={handleFileSelect} />
-            <button className="bg-spot text-white px-4 py-2 rounded-md mr-8" onClick={() => inputFile.current.click()}>
-              Load Dag to Dagflow
+            <button className="bg-spot text-white py-2 rounded-md px-4 mt-4" onClick={() => inputFile.current.click()}>
+              Load Dag to dagflow pipeline
             </button>
-            <button className="bg-primary text-white px-4 py-2 rounded-md">New Pipeline</button>
+          </div>
+          <span className="mt-8 text-2xl">Create a new dag easily and reliably using dagflow</span>
+          <div>
+            <button className="bg-primary text-white py-2 rounded-md px-4 mt-4" onClick={() => setIsCanvasEnabled(true)}>
+              New Dagflow
+            </button>
           </div>
         </div>
       </div>
+      <img className="w-auto mx-auto" src="homepage_illustration2.png" alt="Image Description"></img>
     </div>
   );
 };

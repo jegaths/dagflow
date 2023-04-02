@@ -4,17 +4,17 @@ import Homepage from "./components/Homepage/Homepage";
 import Sidebar from "./components/Sidebar/Sidebar";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { useRecoilValue } from "recoil";
+import { isCanvasEnabledState } from "./atoms";
 
 export default function App() {
+  const isCanvasEnabled = useRecoilValue(isCanvasEnabledState);
   return (
     <>
       <ToastContainer />
-      <div className="flex font-display justify-between">
+      <div className="flex font-display w-full">
         <Sidebar />
-
-        {/* <Homepage /> */}
-
-        <Pipeline />
+        {isCanvasEnabled ? <Pipeline /> : <Homepage />}
       </div>
     </>
   );

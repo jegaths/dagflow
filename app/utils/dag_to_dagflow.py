@@ -138,7 +138,8 @@ class DagToDagFlow:
         def __generate_args(keywords):
             args = {}
             for arg in keywords:
-                args[arg["arg"]] = arg["value"]["id"] if arg["value"]["_type"] == "Name" else arg["value"]["value"]
+                if arg["arg"] != "dag":
+                    args[arg["arg"]] = arg["value"]["id"] if arg["value"]["_type"] == "Name" else arg["value"]["value"]
             return args
 
         posx = 0

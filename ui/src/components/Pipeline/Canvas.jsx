@@ -9,11 +9,11 @@ import Nodes, { nodeTypes } from "./Nodes";
 
 import { useRecoilState, useSetRecoilState, useRecoilValue } from "recoil";
 import { pipelineState, selectedNodeState, reactFlowState, importStatementState, initialNodesState, intialEdgesState } from "./atoms";
+import { v4 as uuidv4 } from "uuid";
 
-// TODO:Remove initialNodes and initialEdges after testing and make it an empty array
-
-let id = 0;
-const getId = () => `${id++}`;
+const getId = () => {
+  return "op_" + uuidv4().replace(/-/g, "_");
+};
 
 const Canvas = () => {
   const reactFlowWrapper = useRef(null);
@@ -70,7 +70,8 @@ const Canvas = () => {
       y: event.clientY - reactFlowBounds.top,
     });
     let parsedData = JSON.parse(data);
-    const id = `${parsedData.name}_${node_id}_${getId()}`;
+    // const id = `${parsedData.name}_${node_id}_${getId()}`;
+    const id = getId();
     const newNode = {
       id: id,
       type,
