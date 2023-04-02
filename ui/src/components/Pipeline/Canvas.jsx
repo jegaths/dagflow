@@ -1,14 +1,5 @@
 import React, { useRef, useCallback } from "react";
-import ReactFlow, {
-  ReactFlowProvider,
-  addEdge,
-  useNodesState,
-  useEdgesState,
-  Controls,
-  Background,
-  ControlButton,
-  Panel,
-} from "reactflow";
+import ReactFlow, { ReactFlowProvider, addEdge, useNodesState, useEdgesState, Controls, Background, ControlButton, Panel } from "reactflow";
 
 import { AiFillDelete } from "react-icons/ai";
 
@@ -16,85 +7,23 @@ import "reactflow/dist/style.css";
 
 import Nodes, { nodeTypes } from "./Nodes";
 
-import { useRecoilState, useSetRecoilState } from "recoil";
-import {
-  pipelineState,
-  selectedNodeState,
-  reactFlowState,
-  importStatementState,
-} from "./atoms";
+import { useRecoilState, useSetRecoilState, useRecoilValue } from "recoil";
+import { pipelineState, selectedNodeState, reactFlowState, importStatementState, initialNodesState, intialEdgesState } from "./atoms";
 
 // TODO:Remove initialNodes and initialEdges after testing and make it an empty array
-let initialNodes = [
-  {
-    data: "PythonOperator_1_0",
-    dragging: false,
-    id: "PythonOperator_1_0",
-    position: { x: 153.203125, y: -4.5 },
-    positionAbsolute: { x: 153.203125, y: -4.5 },
-    selected: false,
-    type: "pythonOperator",
-    width: 264,
-    height: 86,
-  },
-  {
-    data: "PythonOperator_1_1",
-    dragging: false,
-    id: "PythonOperator_1_1",
-    position: { x: 170.3046875, y: 155.75 },
-    positionAbsolute: { x: 170.3046875, y: 155.75 },
-    selected: true,
-    type: "pythonOperator",
-    width: 264,
-    height: 86,
-  },
-  {
-    data: "PythonOperator_1_2",
-    dragging: false,
-    id: "PythonOperator_1_2",
-    position: { x: 180.8046875, y: 250.25 },
-    positionAbsolute: { x: 180.8046875, y: 250.25 },
-    selected: false,
-    type: "pythonOperator",
-    width: 264,
-    height: 86,
-  },
-];
-
-let initialEdges = [
-  {
-    animated: true,
-    id: "reactflow__edge-PythonOperator_1_0a-PythonOperator_1_1a",
-    source: "PythonOperator_1_0",
-    sourceHandle: "a",
-    targetHandle: "a",
-    target: "PythonOperator_1_1",
-  },
-  {
-    animated: true,
-    id: "reactflow__edge-PythonOperator_1_1a-PythonOperator_1_2a",
-    source: "PythonOperator_1_1",
-    sourceHandle: "a",
-    targetHandle: "a",
-    target: "PythonOperator_1_2",
-  },
-];
-
-initialNodes = [];
-initialEdges = [];
 
 let id = 0;
 const getId = () => `${id++}`;
 
 const Canvas = () => {
   const reactFlowWrapper = useRef(null);
+  const initialEdges = useRecoilValue(intialEdgesState);
+  const initialNodes = useRecoilValue(initialNodesState);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [reactFlowInstance, setReactFlowInstance] =
-    useRecoilState(reactFlowState);
+  const [reactFlowInstance, setReactFlowInstance] = useRecoilState(reactFlowState);
   const setSelectedNodeId = useSetRecoilState(selectedNodeState);
-  const [importStatement, setImportStatement] =
-    useRecoilState(importStatementState);
+  const [importStatement, setImportStatement] = useRecoilState(importStatementState);
   const [pipelineData, setPipelineData] = useRecoilState(pipelineState);
   const onConnect = useCallback((params) => {
     // Make the edges animated
@@ -188,32 +117,9 @@ const Canvas = () => {
     <div className="flex flex-col w-full">
       <div className="flex flex-row">
         <ReactFlowProvider>
-          <div
-            className="reactflow-wrapper w-full h-full"
-            style={{ height: "82vh", width: "100%" }}
-            ref={reactFlowWrapper}>
-            <ReactFlow
-              onNodesDelete={onNodeDelete}
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              onInit={setReactFlowInstance}
-              onDrop={onDrop}
-              onDragOver={onDragOver}
-              nodeTypes={nodeTypes}
-              onSelectionChange={(nodes, edges) =>
-                setSelectionChange(nodes, edges)
-              }
-              selectNodesOnDrag
-              fitView>
-              <Background
-                className="bg-secondaryLight"
-                variant="dots"
-                size={3}
-                gap={40}
-              />
+          <div className="reactflow-wrapper w-full h-full" style={{ height: "82vh", width: "100%" }} ref={reactFlowWrapper}>
+            <ReactFlow onNodesDelete={onNodeDelete} nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} onInit={setReactFlowInstance} onDrop={onDrop} onDragOver={onDragOver} nodeTypes={nodeTypes} onSelectionChange={(nodes, edges) => setSelectionChange(nodes, edges)} selectNodesOnDrag fitView>
+              <Background className="bg-secondaryLight" variant="dots" size={3} gap={40} />
               <Controls showInteractive={false} position="top-right">
                 <ControlButton>
                   <AiFillDelete />

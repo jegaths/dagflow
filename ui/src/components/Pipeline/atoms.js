@@ -43,3 +43,13 @@ export const selectedTabState = atom({
     default: 0
 })
 
+
+export const intialEdgesState = atom({
+    key: "intialEdgesState",
+    default: []
+})
+
+export const initialNodesState = atom({
+    key: "initialNodesState",
+    default: []
+})
