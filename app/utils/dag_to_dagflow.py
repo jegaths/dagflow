@@ -1,4 +1,5 @@
 import json
+from utils.json_to_source import JsonToSource
 
 
 class DagToDagFlow:
@@ -11,6 +12,11 @@ class DagToDagFlow:
                 json_data = json.load(f)
         else:
             json_data = json.loads(json_string)
+        self.empty_ast = {
+            "_type": "Module",
+            "body": [],
+            "type_ignores": []
+        }
         self.seperated_statements = {}
         self.__generate_dagflow(json_data)
 
@@ -44,7 +50,7 @@ class DagToDagFlow:
         self.seperated_statements = {"import_statements": import_statements, "dag_statment": dag_statment, "global_statments": global_statments,
                                      "operator_statments": operator_statments, "binop_statements": binop_statements, "variable_taskId_mapping": variable_taskId_mapping}
 
-    def extract_source_target_pairs(self, expr):
+    def __extract_edge_source_target_pairs(self, expr):
         pairs = []
         if expr['_type'] == 'BinOp':
             if expr['left']['_type'] == 'Name' and expr['right']['_type'] == 'Name':
@@ -57,7 +63,7 @@ class DagToDagFlow:
                     'target': expr['right']['id']
                 })
             elif expr['left']['_type'] == 'BinOp' and expr['right']['_type'] == 'Name':
-                pairs += self.extract_source_target_pairs(expr['left'])
+                pairs += self.__extract_edge_source_target_pairs(expr['left'])
                 pairs.append({
                     'animated': True,
                     'id': f'reactflow__edge-{self.seperated_statements["variable_taskId_mapping"][expr["left"]["right"]["id"]]}a-{self.seperated_statements["variable_taskId_mapping"][expr["right"]["id"]]}a',
@@ -75,10 +81,10 @@ class DagToDagFlow:
                     'source': expr['left']['id'],
                     'target': expr['right']['left']['id']
                 })
-                pairs += self.extract_source_target_pairs(expr['right'])
+                pairs += self.__extract_edge_source_target_pairs(expr['right'])
             elif expr['left']['_type'] == 'BinOp' and expr['right']['_type'] == 'BinOp':
-                pairs += self.extract_source_target_pairs(expr['left'])
-                pairs += self.extract_source_target_pairs(expr['right'])
+                pairs += self.__extract_edge_source_target_pairs(expr['left'])
+                pairs += self.__extract_edge_source_target_pairs(expr['right'])
                 pairs.append({
                     'animated': True,
                     'id': f'reactflow__edge-{self.seperated_statements["variable_taskId_mapping"][expr["left"]["right"]["id"]]}a-{self.seperated_statements["variable_taskId_mapping"][expr["right"]["left"]["id"]]}a',
@@ -89,9 +95,16 @@ class DagToDagFlow:
                 })
         return pairs
 
+    def __generate_import_staments(self, imports: list):
+        self.empty_ast["body"] = []
+        self.empty_ast["body"].extend(imports)
+        print(JsonToSource(json_string=json.dumps(self.empty_ast)).get())
+
     def __generate_dagflow(self, data):
         self.__seperate_source_json(data)
         edges = []
         for binop_statement in self.seperated_statements["binop_statements"]:
-            edges.extend(self.extract_source_target_pairs(binop_statement["value"]))
+            edges.extend(self.__extract_edge_source_target_pairs(binop_statement["value"]))
+
+        self.__generate_import_staments(self.seperated_statements["import_statements"])
         print(json.dumps(edges, indent=4))
