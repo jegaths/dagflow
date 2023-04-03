@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import FloatingEditor from "../FloatingEditor";
 import FloatingLabelInput from "../FloatingLabelInput";
-import { pipelineState, selectedNodeState, isDetailsPaneOpenState, selectedTabState, importStatementState } from "./atoms";
+import { pipelineState, selectedNodeState, isDetailsPaneOpenState, selectedTabState, importStatementState, nodeListState } from "./atoms";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { FiChevronUp } from "react-icons/fi";
 
@@ -11,6 +11,7 @@ const Details = () => {
   const [importStatement, setImportStatement] = useRecoilState(importStatementState);
   const [isDetailsPaneOpen, setIsDetailsPaneOpen] = useRecoilState(isDetailsPaneOpenState);
   const [selectedTab, setSelectedTab] = useRecoilState(selectedTabState);
+  const nodeDetails = useRecoilValue(nodeListState);
 
   const handlePipelineDetailsChange = (data, key) => {
     setPipelineData({
@@ -99,9 +100,10 @@ const Details = () => {
         <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 2 ? "h-full " : "h-0 hidden"}`}>
           {selectedNodeId != undefined && pipelineData.operators[selectedNodeId] != undefined && (
             <div className="">
-              {/* <hr className='w-full bg-primary opacity-10 mb-3' /> */}
               {Object.keys(pipelineData.operators[selectedNodeId]["args"]).map((arg, key) => {
-                return <FloatingLabelInput key={key} label={arg} className="mt-4 mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["args"][arg]} onchange={handleArgsChange} />;
+                const isRequierd = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"])["args"][arg]["required"];
+                const datatype = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"])["args"][arg]["data_type"];
+                return <FloatingLabelInput key={key} label={arg} className="mt-4 mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["args"][arg]} onchange={handleArgsChange} required={isRequierd} type={datatype == "int" ? "number" : "text"} />;
               })}
               <FloatingLabelInput arg_name={"description"} label={"Description"} className="mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["description"]} onchange={handleOperatorDetailsChange} />
             </div>

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from utils.operators import get_operators
 from utils.generate_source_string import GenerateSourceString
@@ -25,6 +25,11 @@ app.add_middleware(
 @app.get("/")
 def root():
     return "Dagflow!"
+
+
+@app.get("/operators")
+def get_operator_list():
+    return get_operators()
 
 
 @app.get("/operators")

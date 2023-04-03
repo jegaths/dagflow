@@ -1,3 +1,6 @@
+from utils.operators import get_datatype
+
+
 class GenerateSourceString:
     def __init__(self, data: dict):
         self.__data = data
@@ -7,13 +10,32 @@ class GenerateSourceString:
         self.__relation_str = ""
         self.__dag_str = ""
 
+    # TODO: Render arguments based on the datatype. Example: If the argument is integer render it without quotes
     def __generate_operator_statements(self, operators: dict, dag_variable_name: str) -> list:
+        args = {}
+        for operator in list(set([operators[key]["name"] for key in operators])):
+            args[operator] = get_datatype(operator)
+
+        print("\n\n")
+        print(args)
         for key in operators:
             operator = operators[key]
             operator_args_str = f"""{operator['name']}("""
             for k, v in operator["args"].items():
                 if v != "":
-                    operator_args_str += f"""{k} = {v},""" if k == "python_callable" else f"""{k} = '{v}',"""
+                    # finding the datatype for the particular argument. If integer render without quotes
+                    # TODO: Currenly quote removal is added only for integer values. For other datatypes quotes are default. Need to test on other datatypes and update accordingly
+                    arg_type = (
+                        args[f'{operator["name"]}'].get(f"{k}", None)["data_type"]
+                        if args[f'{operator["name"]}'].get(f"{k}", None) != None
+                        else "string"
+                    )
+                    operator_args_str += (
+                        f"""{k} = {v},"""
+                        # if k == "python_callable"
+                        if k == "python_callable" or arg_type == "int"
+                        else f"""{k} = '{v}',"""
+                    )
             operator_args_str += f"""dag = {dag_variable_name})\n"""
             self.__arg_str += f'{operator["args"]["task_id"]} = {operator_args_str}'
 
