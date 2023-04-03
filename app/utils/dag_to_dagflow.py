@@ -131,8 +131,12 @@ class DagToDagFlow:
 
     def __generate_dag_statement(self, statements: list):
         self.empty_ast["body"] = []
-        self.empty_ast["body"].append(statements)
-        self.__dag_statement = JsonToSource(json_string=json.dumps(self.empty_ast)).get()
+        self.empty_ast["body"].append(statements["value"])
+        # self.__dag_statement = JsonToSource(json_string=json.dumps(self.empty_ast)).get()
+        self.__dag_statement = {
+            "dag_variable_name": statements["targets"][0]["id"],
+            "call": JsonToSource(json_string=json.dumps(self.empty_ast)).get(),
+        }
 
     def __generate_nodes_and_operators(self, statements: list):
         def __generate_args(keywords):
