@@ -57,7 +57,6 @@ const Canvas = () => {
 
     const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
     const type = event.dataTransfer.getData("application/reactflow");
-    const node_id = event.dataTransfer.getData("id");
     const data = event.dataTransfer.getData("data");
 
     // check if the dropped element is valid
@@ -86,8 +85,6 @@ const Canvas = () => {
     let args = {};
     Object.keys(parsedData.args).map((key) => {
       if (key == "task_id") args["task_id"] = id;
-      //TODO: Remove this else if after testing
-      else if (key == "python_callable") args["python_callable"] = "test";
       else args[key] = parsedData.args[key].default_argument;
     });
 
@@ -126,7 +123,7 @@ const Canvas = () => {
                   <AiFillDelete />
                 </ControlButton>
               </Controls>
-              <Panel position="top-left" className="bg-white">
+              <Panel position="top-left" className="bg-white rounded-md shadow-md">
                 <Nodes />
               </Panel>
             </ReactFlow>

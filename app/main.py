@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from utils.source_to_json import SourceToJson
 from utils.json_to_source import JsonToSource
 import json
-from collections import defaultdict
+import os
 
 origins = ["*"]
 
@@ -49,14 +49,13 @@ def generate_dag(data: Item):
     # Extending base json with the created json
     base_json["body"].extend(obj["body"])
     # Converting the json back to python source code and saving as a file
-    JsonToSource(json_string=json.dumps(base_json, indent=4)).save("/dags/generated_dag.py")
+    JsonToSource(json_string=json.dumps(base_json, indent=4)).save(f"/dags/{data['pipeline_name']}.py")
     return {"status": True}
 
 
 @app.post("/generate_flow")
 def generate_flow(file: UploadFile):
-    # SourceToJson(python_code_string=file.file.read().decode("utf-8")).save("source_to_json.json")
     data = SourceToJson(python_code_string=file.file.read().decode("utf-8")).json_str()
     dagflow = DagToDagFlow(json_string=data).get()
+    dagflow["pipeline_name"] = os.path.splitext(file.filename)[0]
     return dagflow
-    # print(json.dumps(dagflow, indent=4))
