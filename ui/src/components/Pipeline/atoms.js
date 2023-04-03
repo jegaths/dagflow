@@ -5,11 +5,16 @@ export const selectedNodeState = atom({
     default: undefined,
 })
 
+export const importStatementState = atom({
+    key: "importStatementState",
+    default: "from airflow import DAG\nfrom airflow.utils.dates import days_ago\nfrom datetime import timedelta",
+})
+
 export const pipelineState = atom({
     key: "pipelineState",
     // TODO:Have to remove this line after testing
     default: {
-        "pipeline_name": "", "global": "def test():\r\n    print(\"It will be ok!\")", "operators": {}, "react_flow_data": {}
+        "pipeline_name": "", "global": "def test():\r\n    print(\"It will be ok!\")", "operators": {}, "react_flow_data": {}, "dag_statement": "dag = DAG('dagflow_dag_id', default_args={'owner': 'Dagflow', 'depends_on_past': True, 'start_date': days_ago(1), 'email': ['dagflow@gmail.com'], 'email_on_failure': False, 'email_on_retry': False, 'retries': 3, 'retry_delay': timedelta(minutes=5)}, description='Dagflow dag description', schedule_interval='0 0 * * *')"
     },
     // TODO:Enable this line after testing
     // default: { "pipeline_name": "", "global": "", "operators": {}, "react_flow_data": {} },
@@ -38,3 +43,13 @@ export const selectedTabState = atom({
     default: 0
 })
 
+
+export const intialEdgesState = atom({
+    key: "intialEdgesState",
+    default: []
+})
+
+export const initialNodesState = atom({
+    key: "initialNodesState",
+    default: []
+})

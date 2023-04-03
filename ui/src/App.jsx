@@ -1,19 +1,21 @@
 import React from "react";
-// import Canvas from "./components/Canvas/Canvas";
 import Pipeline from "./components/Pipeline/Pipeline";
-import Details from "./components/Pipeline/Details";
-import Sidebar from "./components/Sidebar/Sidebar"
-import 'react-toastify/dist/ReactToastify.css';
+import Homepage from "./components/Homepage/Homepage";
+import Sidebar from "./components/Sidebar/Sidebar";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
+import { useRecoilValue } from "recoil";
+import { isCanvasEnabledState } from "./atoms";
 
 export default function App() {
-    return (
-        <>
-            <div className="flex font-display justify-between">
-                <Sidebar />
-                <Pipeline />
-                {/* <Details /> */}
-            </div>
-        </>
-
-    );
+  const isCanvasEnabled = useRecoilValue(isCanvasEnabledState);
+  return (
+    <>
+      <ToastContainer />
+      <div className="flex font-display w-full">
+        <Sidebar />
+        {isCanvasEnabled ? <Pipeline /> : <Homepage />}
+      </div>
+    </>
+  );
 }

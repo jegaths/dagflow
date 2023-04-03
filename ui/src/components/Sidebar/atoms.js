@@ -4,7 +4,7 @@ import { IoSettingsOutline } from "react-icons/io5";
 
 export const toggleSidebarState = atom({
     key: "toggleSidebarState",
-    default: true,
+    default: false,
 })
 
 export const menuItemState = atom({
