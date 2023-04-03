@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { BASE_URL } from "../../constants";
 
 import { useSetRecoilState } from "recoil";
-import { initialNodesState, intialEdgesState, pipelineState } from "../Pipeline/atoms";
+import { initialNodesState, intialEdgesState, pipelineState, importStatementState } from "../Pipeline/atoms";
 import { isCanvasEnabledState } from "../../atoms";
 
 const Homepage = () => {
@@ -11,6 +11,7 @@ const Homepage = () => {
   const setInitialNodes = useSetRecoilState(initialNodesState);
   const setPipelineData = useSetRecoilState(pipelineState);
   const setIsCanvasEnabled = useSetRecoilState(isCanvasEnabledState);
+  const setImportStatements = useSetRecoilState(importStatementState);
 
   const inputFile = useRef(null);
 
@@ -34,6 +35,7 @@ const Homepage = () => {
           resolve(result);
           setInitialEdges(result.react_flow_data.edges);
           setInitialNodes(result.react_flow_data.nodes);
+          setImportStatements(result.import_statements);
           setPipelineData((prev) => ({
             ...prev,
             operators: result.operators,
