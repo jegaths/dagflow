@@ -1,8 +1,8 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef, useEffect } from "react";
 import FloatingEditor from "../FloatingEditor";
 import FloatingLabelInput from "../FloatingLabelInput";
-import { pipelineState, selectedNodeState, isDetailsPaneOpenState, selectedTabState, importStatementState, nodeListState } from "./atoms";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { pipelineState, selectedNodeState, isDetailsPaneOpenState, selectedTabState, importStatementState, nodeListState, formRefState } from "./atoms";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { FiChevronUp } from "react-icons/fi";
 
 const Details = () => {
@@ -12,6 +12,12 @@ const Details = () => {
   const [isDetailsPaneOpen, setIsDetailsPaneOpen] = useRecoilState(isDetailsPaneOpenState);
   const [selectedTab, setSelectedTab] = useRecoilState(selectedTabState);
   const nodeDetails = useRecoilValue(nodeListState);
+  const setFormRef = useSetRecoilState(formRefState);
+  const ref = useRef();
+
+  useEffect(() => {
+    setFormRef(ref);
+  }, [ref]);
 
   const handlePipelineDetailsChange = (data, key) => {
     setPipelineData({
@@ -96,30 +102,33 @@ const Details = () => {
         </div>
         <FiChevronUp size={25} onClick={handleDetailsPaneClick} className={`cursor-pointer duration-300 ${isDetailsPaneOpen && "rotate-180"}`} />
       </div>
-      <div className={`${isDetailsPaneOpen == true ? "h-80" : "h-0"} transition-height duration-300 ease-in-out`}>
-        <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 1 ? "h-full" : "h-0 hidden"}`}>
-          <FloatingLabelInput label={"Pipeline Name"} arg_name="pipeline_name" className="mt-4 mb-4 text-primary" value={pipelineData.pipeline_name} onchange={handlePipelineDetailsChange} />
-          <FloatingEditor label={"Global"} arg_name={"global"} className="mb-6 text-primary" data={pipelineData.global} onchange={handlePipelineDetailsChange} height={"30vh"} />
+      <form ref={ref}>
+        <div className={`${isDetailsPaneOpen == true ? "h-80" : "h-0"} transition-height duration-300 ease-in-out`}>
+          <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 1 ? "h-full" : "h-0 hidden"}`}>
+            <FloatingLabelInput label={"Pipeline Name"} arg_name="pipeline_name" className="mt-4 mb-4 text-primary" value={pipelineData.pipeline_name} onchange={handlePipelineDetailsChange} required={true} />
+            <FloatingEditor label={"Global"} arg_name={"global"} className="mb-6 text-primary" data={pipelineData.global} onchange={handlePipelineDetailsChange} height={"30vh"} />
+          </div>
+
+          <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 3 ? "h-full" : "h-0 hidden"}`}>
+            <FloatingEditor label={"Dag Details"} arg_name={"dag_statement"} className="mb-6 text-primary dag-statement-input" data={pipelineData.dag_statement.call} onchange={handleDagDetailsChange} height={"30vh"} required={true} />
+          </div>
+          <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 4 ? "h-full" : "h-0 hidden"}`}>
+            <FloatingEditor label={"Imports"} arg_name={"import_statements"} className="mb-6 text-primary" data={importStatement} onchange={handleImportStatementChange} height={"30vh"} />
+          </div>
+          <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 2 ? "h-full " : "h-0 hidden"}`}>
+            {selectedNodeId != undefined && pipelineData.operators[selectedNodeId] != undefined && (
+              <div className="">
+                {Object.keys(pipelineData.operators[selectedNodeId]["args"]).map((arg, key) => {
+                  const isRequierd = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"])["args"][arg]["required"];
+                  const datatype = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"])["args"][arg]["data_type"];
+                  return <FloatingLabelInput key={key} label={arg} className="mt-4 mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["args"][arg]} onchange={handleArgsChange} required={isRequierd} type={datatype == "int" ? "number" : "text"} />;
+                })}
+                <FloatingLabelInput arg_name={"description"} label={"Description"} className="mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["description"]} onchange={handleOperatorDetailsChange} />
+              </div>
+            )}
+          </div>
         </div>
-        <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 3 ? "h-full" : "h-0 hidden"}`}>
-          <FloatingEditor label={"Dag Details"} arg_name={"dag_statement"} className="mb-6 text-primary" data={pipelineData.dag_statement.call} onchange={handleDagDetailsChange} height={"30vh"} />
-        </div>
-        <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 4 ? "h-full" : "h-0 hidden"}`}>
-          <FloatingEditor label={"Imports"} arg_name={"import_statements"} className="mb-6 text-primary" data={importStatement} onchange={handleImportStatementChange} height={"30vh"} />
-        </div>
-        <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 2 ? "h-full " : "h-0 hidden"}`}>
-          {selectedNodeId != undefined && pipelineData.operators[selectedNodeId] != undefined && (
-            <div className="">
-              {Object.keys(pipelineData.operators[selectedNodeId]["args"]).map((arg, key) => {
-                const isRequierd = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"])["args"][arg]["required"];
-                const datatype = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"])["args"][arg]["data_type"];
-                return <FloatingLabelInput key={key} label={arg} className="mt-4 mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["args"][arg]} onchange={handleArgsChange} required={isRequierd} type={datatype == "int" ? "number" : "text"} />;
-              })}
-              <FloatingLabelInput arg_name={"description"} label={"Description"} className="mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["description"]} onchange={handleOperatorDetailsChange} />
-            </div>
-          )}
-        </div>
-      </div>
+      </form>
     </div>
   );
 };
