@@ -16,8 +16,6 @@ class GenerateSourceString:
         for operator in list(set([operators[key]["name"] for key in operators])):
             args[operator] = get_datatype(operator)
 
-        print("\n\n")
-        print(args)
         for key in operators:
             operator = operators[key]
             operator_args_str = f"""{operator['name']}("""

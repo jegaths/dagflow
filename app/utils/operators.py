@@ -34,7 +34,6 @@ def get_default_args(func) -> dict:
             elif datatype == "None" or datatype == "":
                 __default_argument = ""
             else:
-                print(datatype)
                 __default_argument = str(param.default)
             temp["default_argument"] = __default_argument
             temp["data_type"] = datatype

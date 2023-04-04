@@ -67,6 +67,16 @@ const Details = () => {
     [setImportStatement]
   );
 
+  const handleDagDetailsChange = (data, key) => {
+    setPipelineData({
+      ...pipelineData,
+      [key]: {
+        ...pipelineData[key],
+        ["call"]: data,
+      },
+    });
+  };
+
   return (
     <div className="absolute bottom-0 bg-secondary w-full">
       <div className="flex px-10 flex-row justify-between items-center">
@@ -92,7 +102,7 @@ const Details = () => {
           <FloatingEditor label={"Global"} arg_name={"global"} className="mb-6 text-primary" data={pipelineData.global} onchange={handlePipelineDetailsChange} height={"30vh"} />
         </div>
         <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 3 ? "h-full" : "h-0 hidden"}`}>
-          <FloatingEditor label={"Dag Details"} arg_name={"dag_statement"} className="mb-6 text-primary" data={pipelineData.dag_statement.call} onchange={handlePipelineDetailsChange} height={"30vh"} />
+          <FloatingEditor label={"Dag Details"} arg_name={"dag_statement"} className="mb-6 text-primary" data={pipelineData.dag_statement.call} onchange={handleDagDetailsChange} height={"30vh"} />
         </div>
         <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 4 ? "h-full" : "h-0 hidden"}`}>
           <FloatingEditor label={"Imports"} arg_name={"import_statements"} className="mb-6 text-primary" data={importStatement} onchange={handleImportStatementChange} height={"30vh"} />

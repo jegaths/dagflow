@@ -42,6 +42,7 @@ const Homepage = () => {
             ...prev,
             operators: result.operators,
             dag_statement: result.dag_statement,
+            global: result.global,
             pipeline_name: result.pipeline_name == "" ? "df_pipeline_" + uuidv4().replace(/-/g, "_") : result.pipeline_name,
           }));
           setIsCanvasEnabled(true);
