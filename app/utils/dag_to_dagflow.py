@@ -31,6 +31,7 @@ class DagToDagFlow:
         operator_statments = []
         binop_statements = []
         variable_taskId_mapping = {}
+        operator_vars = set()
         for item in data["body"]:
             if item["_type"] == "ImportFrom" or item["_type"] == "Import":
                 import_statements.append(item)
@@ -49,6 +50,7 @@ class DagToDagFlow:
                 keywords = [x for x in keywords if x["arg"] == "task_id" or x["arg"] == "dag"]
                 if len(keywords) == 2:
                     if item["_type"] == "Assign":
+                        operator_vars.add(item["targets"][0]["id"])
                         variable_taskId_mapping[item["targets"][0]["id"]] = [
                             x["value"]["value"] for x in keywords if x["arg"] == "task_id"
                         ][0]
@@ -56,6 +58,9 @@ class DagToDagFlow:
             elif item["value"]["_type"] == "BinOp":
                 binop_statements.append(item)
             else:
+                # skip adding to global assignment if it is a operator expression. Eg: mytaskvariableName
+                if item["_type"] == "Expr" and item.get("value", {}).get("id", "") in operator_vars:
+                    continue
                 global_statments.append(item)
         self.seperated_statements = {
             "import_statements": import_statements,

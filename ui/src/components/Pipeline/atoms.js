@@ -47,3 +47,8 @@ export const initialNodesState = atom({
     key: "initialNodesState",
     default: []
 })
+
+export const formRefState = atom({
+    key: "formRefState",
+    default: null
+})

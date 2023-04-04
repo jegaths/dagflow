@@ -12,7 +12,8 @@ module.exports = {
             menuItem: "#3C3A89",
             white: "#ffffff",
             muted: "#ADADAD",
-            spot: "#8A81B5"
+            spot: "#8A81B5",
+            error: "#ff6347"
         },
         fontFamily: {
             display: ["Outfit", "sans-serif"],

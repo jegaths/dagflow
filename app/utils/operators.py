@@ -11,21 +11,16 @@ def import_from(filename, functionName):
     return getattr(module, functionName)
 
 
+def get_datatype(operator_name: str) -> dict:
+    imported_operator = import_from(
+        ALLOWED_OPERATORS[operator_name][1],
+        operator_name,
+    )
+    return get_default_args(imported_operator.__init__)
+
+
 def get_default_args(func) -> dict:
-    signature = inspect.signature(func)
-    return {
-        k: {
-            "default_argument": str(v.default)
-            if v.default is not inspect.Parameter.empty and v.default != None
-            else "",
-            "data_type": str(v.annotation) if v.annotation is not inspect.Parameter.empty else "No datatype specified",
-        }
-        for k, v in signature.parameters.items()
-        if k not in ["self"]
-    }
-
-
-def get_default_args_v2(func) -> dict:
+    # To get if an argument is mandatory to create an object in Python, you can check if the argument has a default value of inspect.Parameter.empty. If it does not have a default value, then the argument is mandatory.
     sig = inspect.signature(func)
     res = {}
     for param in sig.parameters.values():
@@ -33,13 +28,19 @@ def get_default_args_v2(func) -> dict:
             continue
         temp = {}
         if param.default is not inspect.Parameter.empty:
-            # print(f"{param.name}: default={param.default}, type={type(param.default).__name__}")
-            temp["default_argument"] = str(param.default)
-            temp["data_type"] = type(param.default).__name__
+            datatype = "" if type(param.default).__name__ == "NoneType" else type(param.default).__name__
+            if datatype == "int":
+                __default_argument = int(param.default)
+            elif datatype == "None" or datatype == "":
+                __default_argument = ""
+            else:
+                __default_argument = str(param.default)
+            temp["default_argument"] = __default_argument
+            temp["data_type"] = datatype
             temp["required"] = False
         else:
-            temp["default_argument"] = None
-            temp["data_type"] = "None"
+            temp["default_argument"] = ""
+            temp["data_type"] = ""
             temp["required"] = True
         res[param.name] = temp
     return res
