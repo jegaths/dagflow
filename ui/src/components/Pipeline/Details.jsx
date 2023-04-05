@@ -106,7 +106,7 @@ const Details = () => {
         <div className={`${isDetailsPaneOpen == true ? "h-80" : "h-0"} transition-height duration-300 ease-in-out`}>
           <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 1 ? "h-full" : "h-0 hidden"}`}>
             <FloatingLabelInput label={"Pipeline Name"} arg_name="pipeline_name" className="mt-4 mb-4 text-primary" value={pipelineData.pipeline_name} onchange={handlePipelineDetailsChange} required={true} />
-            <FloatingEditor label={"Global"} arg_name={"global"} className="mb-6 text-primary" data={pipelineData.global} onchange={handlePipelineDetailsChange} height={"30vh"} />
+            <FloatingEditor label={"Global"} arg_name={"global_statements"} className="mb-6 text-primary" data={pipelineData.global_statements} onchange={handlePipelineDetailsChange} height={"30vh"} />
           </div>
 
           <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 3 ? "h-full" : "h-0 hidden"}`}>

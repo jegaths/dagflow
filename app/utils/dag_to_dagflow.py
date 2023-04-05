@@ -180,6 +180,8 @@ class DagToDagFlow:
         self.__seperate_source_json(data)
         for binop_statement in self.seperated_statements["binop_statements"]:
             self.__edges.extend(self.__extract_edge_source_target_pairs(binop_statement["value"]))
+        self.__edges = list(set(tuple(sorted(d.items())) for d in self.__edges))
+        self.__edges = [dict(t) for t in self.__edges]
 
         self.__generate_dag_statement(self.seperated_statements["dag_statment"])
         self.__generate_import_staments(self.seperated_statements["import_statements"])
@@ -189,7 +191,7 @@ class DagToDagFlow:
     def get(self) -> dict:
         return {
             "pipeline_name": "",
-            "global": self.__global_statements,
+            "global_statements": self.__global_statements,
             "operators": self.__operators,
             "react_flow_data": {
                 "nodes": self.__nodes,

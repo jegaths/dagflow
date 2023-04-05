@@ -12,7 +12,7 @@ const Nodes = () => {
   const [nodeList, setNodeList] = useRecoilState(nodeListState);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/operators`)
+    fetch(`${BASE_URL}/dagflow/operators`)
       .then((res) => res.json())
       .then((result) => {
         setNodeList(result);
@@ -30,7 +30,7 @@ const Nodes = () => {
     <div className="overflow-auto">
       <ul className="w-48 text-sm font-medium text-gray-900 bg-white"></ul>
       {nodeList.map((item, index) => (
-        <li key={item.id} className="w-full px-4 list-none">
+        <li key={index} className="w-full px-4 list-none">
           <div id={item.id} onDragStart={(event) => onDragStart(event, item.node_type, item)} draggable>
             <span className="font-medium flex justify-start items-center gap-2 py-2">
               <AiOutlineNodeIndex /> {item.name}

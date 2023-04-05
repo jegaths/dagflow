@@ -13,7 +13,7 @@ export const importStatementState = atom({
 export const pipelineState = atom({
     key: "pipelineState",
     default: {
-        "pipeline_name": "", "global": "", "operators": {}, "react_flow_data": {}, "dag_statement": {}
+        "pipeline_name": "", "global_statements": "", "operators": {}, "react_flow_data": {}, "dag_statement": {}
     },
 })
 

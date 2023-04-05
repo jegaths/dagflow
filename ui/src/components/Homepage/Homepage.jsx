@@ -31,7 +31,7 @@ const Homepage = () => {
     };
 
     const myPromise = new Promise((resolve) =>
-      fetch(`${BASE_URL}/generate_flow`, requestOptions)
+      fetch(`${BASE_URL}/dagflow/generate_flow`, requestOptions)
         .then((res) => res.json())
         .then((result) => {
           resolve(result);
@@ -42,7 +42,7 @@ const Homepage = () => {
             ...prev,
             operators: result.operators,
             dag_statement: result.dag_statement,
-            global: result.global,
+            global_statements: result.global_statements,
             pipeline_name: result.pipeline_name == "" ? "df_pipeline_" + uuidv4().replace(/-/g, "_") : result.pipeline_name,
           }));
           setIsCanvasEnabled(true);

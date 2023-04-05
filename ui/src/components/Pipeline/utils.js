@@ -38,7 +38,30 @@ export const savePipeline = (pipelineData, reactFlowInstance,importStatement,for
     const _pipelineData = {...pipelineData}
     _pipelineData["react_flow_data"] = reactFlowInstance.toObject()
     _pipelineData["import_statements"] = importStatement
-    toast.success("Pipeline saved successfully")
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({ "data": _pipelineData })
+    };
+
+    const myPromise = new Promise((resolve, reject) =>
+        fetch(`${BASE_URL}/dagflow/save_pipeline`, requestOptions)
+            .then((res) => res.json())
+            .then((result) => {
+                resolve(result)
+                console.log(result)
+            }).catch(err => {
+                console.log(err)
+                reject();
+            })
+    );
+
+    toast.promise(myPromise, {
+        pending: "Saving Pipeline",
+        success: "Pipeline saved successfully",
+        error: "Some error occured!"
+    });
 
 }
 
@@ -61,12 +84,15 @@ export const generate_dag = (pipelineData, reactFlowInstance,importStatement,for
         body: JSON.stringify({ "data": _pipelineData })
     };
 
-    const myPromise = new Promise((resolve) =>
-        fetch(`${BASE_URL}/generate_dag`, requestOptions)
+    const myPromise = new Promise((resolve,reject) =>
+        fetch(`${BASE_URL}/dagflow/generate_dag`, requestOptions)
             .then((res) => res.json())
             .then((result) => {
                 resolve(result)
                 console.log(result)
+            }).catch(err => {
+                console.log(err)
+                reject();
             })
     );
 

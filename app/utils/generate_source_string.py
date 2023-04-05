@@ -98,7 +98,7 @@ class GenerateSourceString:
         self.__generate_import_statements(self.__data["import_statements"])
         self.__generate_dag_statement(self.__data["dag_statement"])
         self.__generate_operator_statements(self.__data["operators"], self.__data["dag_statement"]["dag_variable_name"])
-        self.__generate_global_string(self.__data["global"])
+        self.__generate_global_string(self.__data["global_statements"])
         self.__generate_relation_graph_string(
             self.__data["react_flow_data"]["edges"], operators=self.__data["operators"]
         )

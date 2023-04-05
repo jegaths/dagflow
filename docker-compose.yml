@@ -2,11 +2,20 @@
 version: "3.8"
 
 services:
+  mongodb:
+    image: mongo:6.0
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongodb_data:/data/db
   app:
     build: ./app
     command: uvicorn main:app --host 0.0.00 --port 8000 --reload
     volumes:
       - /home/jegath/Documents/docker-airflow-2.1.4/dags:/dags
-      - /home/jegath/Documents/dagflow/app:/app
+      - ./app:/app
     ports:
       - "8000:8000"
+    depends_on:
+      - mongodb
