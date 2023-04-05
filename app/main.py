@@ -2,6 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import dagflow
 from motor.motor_asyncio import AsyncIOMotorClient
+from utils.operators import generate_operators
+from utils.model.operator_model import Operator
+from fastapi.encoders import jsonable_encoder
+from pymongo import UpdateOne
+import json
 
 origins = ["*"]
 
@@ -21,6 +26,21 @@ async def startup_db_client():
     print("Connecting to db..")
     app.mongodb_client = AsyncIOMotorClient("mongodb://mongodb:27017/")
     app.mongodb = app.mongodb_client.dagflow
+
+    collection = app.mongodb.get_collection("operators")
+    operators = [
+        {"id": 1, "name": "PythonOperator", "path": "airflow.operators.python"},
+        {"id": 2, "name": "BashOperator", "path": "airflow.operators.bash"},
+    ]
+
+    data = []
+    for operator in operators:
+        generated_operator = generate_operators(Operator.parse_obj(operator))
+        filter = {"id": generated_operator.id}
+        data.append(UpdateOne(filter, {"$set": jsonable_encoder(generated_operator)}, upsert=True))
+
+    await collection.bulk_write(data)
+    print("Filled operators..")
 
 
 @app.on_event("shutdown")

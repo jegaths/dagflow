@@ -10,7 +10,7 @@ from utils.dag_to_dagflow import DagToDagFlow
 from utils.source_to_json import SourceToJson
 from fastapi import UploadFile
 import os
-from utils.model.pipeline_modal import COLLECTION, Pipeline
+from utils.model.pipeline_model import COLLECTION, Pipeline
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 import datetime
@@ -88,7 +88,6 @@ async def get_pipelines(request: Request, number_of_pipelines: int):
 
 @router.post("/get_pipeline")
 async def get_pipelines(request: Request, pipeline: dict):
-    print(pipeline["pipeline_id"])
     collection = request.app.mongodb.get_collection(COLLECTION)
     projection = {"_id": 0, "updated_at": 0}
     query = {"pipeline_id": pipeline["pipeline_id"]}

@@ -1,5 +1,7 @@
 import inspect
 
+from utils.model.operator_model import Operator, Args
+
 ALLOWED_OPERATORS = {
     "PythonOperator": (1, "airflow.operators.python"),
     "BashOperator": (2, "airflow.operators.bash"),
@@ -64,3 +66,38 @@ def get_operators() -> dict:
         operators.append(operator_details)
 
     return operators
+
+
+def get_default_args_v2(func) -> list[Args]:
+    # To get if an argument is mandatory to create an object in Python, you can check if the argument has a default value of inspect.Parameter.empty. If it does not have a default value, then the argument is mandatory.
+    sig = inspect.signature(func)
+    res = []
+    for param in sig.parameters.values():
+        if param.name in ["self", "args", "kwargs"]:
+            continue
+        temp = Args(**{"name": param.name})
+        if param.default is not inspect.Parameter.empty:
+            datatype = "" if type(param.default).__name__ == "NoneType" else type(param.default).__name__
+            if datatype == "int":
+                __default_argument = int(param.default)
+            elif datatype == "None" or datatype == "":
+                __default_argument = ""
+            else:
+                __default_argument = str(param.default)
+            temp.default_argument = __default_argument
+            temp.data_type = datatype
+            temp.required = False
+        else:
+            temp.default_argument = ""
+            temp.data_type = ""
+            temp.required = True
+        temp.name = param.name
+        res.append(temp)
+    return res
+
+
+def generate_operators(operator: Operator) -> Operator:
+    imported_operator = import_from(operator.path, operator.name)
+    operator_info = get_default_args_v2(imported_operator.__init__)
+    operator.args.extend(operator_info)
+    return operator
