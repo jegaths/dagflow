@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Request, status
 from utils.operators import get_operators
 from pydantic import BaseModel
@@ -12,6 +13,7 @@ import os
 from utils.model.pipeline_modal import COLLECTION, Pipeline
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+import datetime
 
 router = APIRouter(prefix="/dagflow", tags=["dagflow"])
 
@@ -53,13 +55,59 @@ def generate_flow(file: UploadFile):
 @router.post("/save_pipeline")
 async def save_pipeline(request: Request, pipeline: Pipeline):
     pipeline = pipeline.data
+
     collection = request.app.mongodb.get_collection(COLLECTION)
-    filter = {"pipeline_name": pipeline.pipeline_name}
-    result = await collection.update_one(filter, {"$set": jsonable_encoder(pipeline)}, upsert=True)
+    filter = {"pipeline_id": pipeline.pipeline_id}
+    data = jsonable_encoder(pipeline)
+    data["updated_at"] = datetime.datetime.now().isoformat()
+    result = await collection.update_one(filter, {"$set": jsonable_encoder(data)}, upsert=True)
     print("Number of documents matched: ", result.matched_count)
     print("Number of documents modified: ", result.modified_count)
-    print("Upserted ID: ", result.upserted_id)
     return JSONResponse(
-        status_code=status.HTTP_201_CREATED,
+        status_code=status.HTTP_200_OK,
         content={"message": "Pipeline saved successfully", "pipeline": pipeline.pipeline_name},
     )
+
+
+@router.get("/get_recent_pipeline_names/{number_of_pipelines}")
+async def get_pipelines(request: Request, number_of_pipelines: int):
+    collection = request.app.mongodb.get_collection(COLLECTION)
+    projection = {"_id": 0, "pipeline_id": 1, "pipeline_name": 1}
+    # document = await collection.find({}, projection).to_list(length=None)
+    # try:
+    #     data = Pipeline(**{"data": document[0]})
+    # except ValueError as e:
+    #     print(str(e))
+    # return data
+    collection = request.app.mongodb.get_collection(COLLECTION)
+    pipelineNames = (
+        await collection.find({}, projection).limit(number_of_pipelines).sort("updated_at", -1).to_list(length=None)
+    )
+    return pipelineNames
+
+
+@router.post("/get_pipeline")
+async def get_pipelines(request: Request, pipeline: dict):
+    print(pipeline["pipeline_id"])
+    collection = request.app.mongodb.get_collection(COLLECTION)
+    projection = {"_id": 0, "updated_at": 0}
+    query = {"pipeline_id": pipeline["pipeline_id"]}
+    document = await collection.find(query, projection).to_list(length=None)
+    try:
+        data = Pipeline(**{"data": document[0]})
+    except ValueError as e:
+        print(str(e))
+    return data.data
+    # collection = request.app.mongodb.get_collection(COLLECTION)
+    # projection = {"_id": 0, "pipeline_id": 1, "pipeline_name": 1}
+    # # document = await collection.find({}, projection).to_list(length=None)
+    # # try:
+    # #     data = Pipeline(**{"data": document[0]})
+    # # except ValueError as e:
+    # #     print(str(e))
+    # # return data
+    # collection = request.app.mongodb.get_collection(COLLECTION)
+    # pipelineNames = (
+    #     await collection.find({}, projection).limit(number_of_pipelines).sort("updated_at", -1).to_list(length=None)
+    # )
+    # return pipelineNames

@@ -119,10 +119,16 @@ const Details = () => {
             {selectedNodeId != undefined && pipelineData.operators[selectedNodeId] != undefined && (
               <div className="">
                 {Object.keys(pipelineData.operators[selectedNodeId]["args"]).map((arg, key) => {
-                  const isRequierd = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"])["args"][arg]["required"];
-                  const datatype = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"])["args"][arg]["data_type"];
+                  let isRequierd = false;
+                  let datatype = "string";
+                  const item = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"]);
+                  if (item != undefined && item["args"][arg] != undefined) {
+                    isRequierd = item["args"][arg]["required"];
+                    datatype = item["args"][arg]["data_type"];
+                  }
                   return <FloatingLabelInput key={key} label={arg} className="mt-4 mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["args"][arg]} onchange={handleArgsChange} required={isRequierd} type={datatype == "int" ? "number" : "text"} />;
                 })}
+
                 <FloatingLabelInput arg_name={"description"} label={"Description"} className="mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["description"]} onchange={handleOperatorDetailsChange} />
               </div>
             )}

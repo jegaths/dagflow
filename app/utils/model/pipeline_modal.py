@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 COLLECTION = "pipeline"
 
@@ -10,9 +11,9 @@ class Nodes(BaseModel):
     type: str
     position: dict
     data: str
-    selected: bool
+    selected: Optional[bool]
     positionAbsolute: dict
-    dragging: bool
+    dragging: Optional[bool]
 
 
 class Edges(BaseModel):
@@ -66,6 +67,7 @@ class Operators(BaseModel):
 
 
 class PipelineData(BaseModel):
+    pipeline_id: str
     pipeline_name: str
     global_statements: str
     operators: dict[str, Operators]
@@ -77,6 +79,7 @@ class PipelineData(BaseModel):
         schema_extra = {
             "example": {
                 "pipeline_name": "pipeline_name",
+                "pipeline_id": "61d5fa5c5f5e8b1f74d9e9a0",
                 "global_statements": "def test()\n print('test')",
                 "operators": {},
                 "react_flow_data": {},
