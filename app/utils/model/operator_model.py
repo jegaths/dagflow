@@ -1,14 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional
-
-
-# "args": {
-#     "python_callable": {
-#       "default_argument": "",
-#       "data_type": "",
-#       "required": true
-#     },
-# }
 
 
 class Args(BaseModel):

@@ -1,4 +1,3 @@
-from typing import Optional
 from fastapi import APIRouter, Request, status
 from utils.operators import get_operators
 from pydantic import BaseModel
@@ -14,6 +13,7 @@ from utils.model.pipeline_model import COLLECTION, Pipeline
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 import datetime
+from utils.model.operator_model import Operator
 
 router = APIRouter(prefix="/dagflow", tags=["dagflow"])
 
@@ -21,6 +21,19 @@ router = APIRouter(prefix="/dagflow", tags=["dagflow"])
 @router.get("/operators")
 def get_operator_list():
     return get_operators()
+
+
+@router.get("/operators_v2")
+async def get_operator_list(request: Request):
+    collection = request.app.mongodb.get_collection("operators")
+    projection = {"_id": 0}
+    document = await collection.find({}, projection).to_list(length=None)
+    try:
+        data = [Operator(**doc) for doc in document]
+    except ValueError as e:
+        print(str(e))
+    return data
+    # return document
 
 
 class Item(BaseModel):
@@ -97,16 +110,3 @@ async def get_pipelines(request: Request, pipeline: dict):
     except ValueError as e:
         print(str(e))
     return data.data
-    # collection = request.app.mongodb.get_collection(COLLECTION)
-    # projection = {"_id": 0, "pipeline_id": 1, "pipeline_name": 1}
-    # # document = await collection.find({}, projection).to_list(length=None)
-    # # try:
-    # #     data = Pipeline(**{"data": document[0]})
-    # # except ValueError as e:
-    # #     print(str(e))
-    # # return data
-    # collection = request.app.mongodb.get_collection(COLLECTION)
-    # pipelineNames = (
-    #     await collection.find({}, projection).limit(number_of_pipelines).sort("updated_at", -1).to_list(length=None)
-    # )
-    # return pipelineNames
