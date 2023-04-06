@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Request, status
-from utils.operators import get_operators
 from pydantic import BaseModel
 from utils.json_to_source import JsonToSource
 from utils.generate_source_string import GenerateSourceString
@@ -19,11 +18,6 @@ router = APIRouter(prefix="/dagflow", tags=["dagflow"])
 
 
 @router.get("/operators")
-def get_operator_list():
-    return get_operators()
-
-
-@router.get("/operators_v2")
 async def get_operator_list(request: Request):
     collection = request.app.mongodb.get_collection("operators")
     projection = {"_id": 0}
@@ -41,10 +35,10 @@ class Item(BaseModel):
 
 
 @router.post("/generate_dag")
-def generate_dag(data: Item):
+async def generate_dag(data: Item):
     data = data.data
     # Generating the python source code string
-    main_str = GenerateSourceString(data).get()
+    main_str = await GenerateSourceString(data).get()
     # Converting the python source code string to json
     obj = SourceToJson(python_code_string=main_str).get()
     # Loading the base dag json with default statements
@@ -58,9 +52,10 @@ def generate_dag(data: Item):
 
 
 @router.post("/generate_flow")
-def generate_flow(file: UploadFile):
+async def generate_flow(file: UploadFile):
     data = SourceToJson(python_code_string=file.file.read().decode("utf-8")).json_str()
-    dagflow = DagToDagFlow(json_string=data).get()
+    dagflow = DagToDagFlow(json_string=data)
+    dagflow = await dagflow.generate_dagflow()
     dagflow["pipeline_name"] = os.path.splitext(file.filename)[0]
     return dagflow
 

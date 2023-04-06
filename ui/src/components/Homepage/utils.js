@@ -90,7 +90,7 @@ export const handleRecentPipelineClick = (pipelineId, setInitialEdges, setInitia
           dag_statement: result.dag_statement,
           global_statements: result.global_statements,
           pipeline_name: result.pipeline_name == "" ? "df_pipeline_" + uuidv4().replace(/-/g, "_") : result.pipeline_name,
-          pipeline_id: uuidv4(),
+          pipeline_id: result.pipeline_id,
         }));
         setInitialEdges(result.react_flow_data.edges);
         setInitialNodes(result.react_flow_data.nodes);

@@ -1,6 +1,6 @@
 import json
 from utils.json_to_source import JsonToSource
-from utils.operators import ALLOWED_OPERATORS
+from utils.operators import get_operator_details
 
 
 class DagToDagFlow:
@@ -10,9 +10,9 @@ class DagToDagFlow:
             return
         if json_string == None:
             with open(file_path, "r") as f:
-                json_data = json.load(f)
+                self.__json_data = json.load(f)
         else:
-            json_data = json.loads(json_string)
+            self.__json_data = json.loads(json_string)
         self.empty_ast = {"_type": "Module", "body": [], "type_ignores": []}
         self.seperated_statements = {}
         self.__import_statements = ""
@@ -21,7 +21,6 @@ class DagToDagFlow:
         self.__operators = {}
         self.__edges = []
         self.__dag_statement = ""
-        self.__generate_dagflow(json_data)
 
     # Seperate json into different statements
     def __seperate_source_json(self, data):
@@ -143,12 +142,21 @@ class DagToDagFlow:
             "call": JsonToSource(json_string=json.dumps(self.empty_ast)).get(),
         }
 
-    def __generate_nodes_and_operators(self, statements: list):
-        def __generate_args(keywords):
+    async def __generate_nodes_and_operators(self, statements: list):
+        operators_details = {}
+
+        def __generate_args(keywords, all_args):
             args = {}
-            for arg in keywords:
-                if arg["arg"] != "dag":
-                    args[arg["arg"]] = arg["value"]["id"] if arg["value"]["_type"] == "Name" else arg["value"]["value"]
+            existin_args = [arg["arg"] for arg in keywords if arg["arg"] != "dag"]
+            for arg in all_args:
+                if arg not in existin_args:
+                    args[arg] = all_args[arg]["default_argument"]
+                else:
+                    args[arg] = (
+                        keywords[existin_args.index(arg)]["value"]["id"]
+                        if keywords[existin_args.index(arg)]["value"]["_type"] == "Name"
+                        else keywords[existin_args.index(arg)]["value"]["value"]
+                    )
             return args
 
         posx = 0
@@ -169,15 +177,22 @@ class DagToDagFlow:
             )
             posx += width + 20
 
+            # operator_details
+            operator_name = item["value"]["func"]["id"]
+            if operator_name not in operators_details:
+                operator = await get_operator_details(operator_name=operator_name, projection={"args": 1, "path": 1})
+                operators_details[operator_name] = operator
+
             self.__operators[item["targets"][0]["id"]] = {
                 "name": item["value"]["func"]["id"],
-                "import_path": ALLOWED_OPERATORS[item["value"]["func"]["id"]][1],
-                "args": __generate_args(item["value"]["keywords"]),
+                "import_path": operators_details[operator_name]["path"],
+                "args": __generate_args(item["value"]["keywords"], operators_details[operator_name]["args"]),
                 "description": "",
             }
+        # print(operators_details)
 
-    def __generate_dagflow(self, data):
-        self.__seperate_source_json(data)
+    async def generate_dagflow(self):
+        self.__seperate_source_json(self.__json_data)
         for binop_statement in self.seperated_statements["binop_statements"]:
             self.__edges.extend(self.__extract_edge_source_target_pairs(binop_statement["value"]))
         self.__edges = list(set(tuple(sorted(d.items())) for d in self.__edges))
@@ -186,9 +201,8 @@ class DagToDagFlow:
         self.__generate_dag_statement(self.seperated_statements["dag_statment"])
         self.__generate_import_staments(self.seperated_statements["import_statements"])
         self.__generate_global_staments(self.seperated_statements["global_statments"])
-        self.__generate_nodes_and_operators(self.seperated_statements["operator_statments"])
+        await self.__generate_nodes_and_operators(self.seperated_statements["operator_statments"])
 
-    def get(self) -> dict:
         return {
             "pipeline_name": "",
             "global_statements": self.__global_statements,
@@ -201,3 +215,17 @@ class DagToDagFlow:
             "import_statements": self.__import_statements,
             "dag_statement": self.__dag_statement,
         }
+
+    # def get(self) -> dict:
+    #     return {
+    #         "pipeline_name": "",
+    #         "global_statements": self.__global_statements,
+    #         "operators": self.__operators,
+    #         "react_flow_data": {
+    #             "nodes": self.__nodes,
+    #             "edges": self.__edges,
+    #             "viewport": {"x": 0, "y": 0, "zoom": 1},
+    #         },
+    #         "import_statements": self.__import_statements,
+    #         "dag_statement": self.__dag_statement,
+    #     }

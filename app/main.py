@@ -1,4 +1,3 @@
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import dagflow
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,11 +5,11 @@ from utils.operators import generate_operators
 from utils.model.operator_model import Operator
 from fastapi.encoders import jsonable_encoder
 from pymongo import UpdateOne
-import json
+
+from utils.app import app
 
 origins = ["*"]
 
-app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,6 +23,8 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_db_client():
     print("Connecting to db..")
+    # Connecting to mongodb on startup and initializing the database. Need to generate the operator lists on startup.
+    # TODO: Have to take the operator list from somewhere else. Maybe a config file or something. Also have to create a list of default operators.
     app.mongodb_client = AsyncIOMotorClient("mongodb://mongodb:27017/")
     app.mongodb = app.mongodb_client.dagflow
 
