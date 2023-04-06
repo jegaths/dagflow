@@ -1,4 +1,4 @@
-from utils.operators import get_datatype
+from utils.operators import get_operator_details
 
 
 class GenerateSourceString:
@@ -11,16 +11,20 @@ class GenerateSourceString:
         self.__dag_str = ""
 
     # TODO: Render arguments based on the datatype. Example: If the argument is integer render it without quotes
-    def __generate_operator_statements(self, operators: dict, dag_variable_name: str) -> list:
+    async def __generate_operator_statements(self, operators: dict, dag_variable_name: str) -> list:
         args = {}
         for operator in list(set([operators[key]["name"] for key in operators])):
-            args[operator] = get_datatype(operator)
+            temp_args = await get_operator_details(operator, projection={"args": 1})
+            args[operator] = temp_args["args"]
 
         for key in operators:
             operator = operators[key]
             operator_args_str = f"""{operator['name']}("""
             for k, v in operator["args"].items():
                 if v != "":
+                    print("**" * 10)
+                    print(args[f'{operator["name"]}'])
+                    print("**" * 10)
                     # finding the datatype for the particular argument. If integer render without quotes
                     # TODO: Currenly quote removal is added only for integer values. For other datatypes quotes are default. Need to test on other datatypes and update accordingly
                     arg_type = (
@@ -93,12 +97,14 @@ class GenerateSourceString:
         orphans = "\n".join([self.__data["operators"][x]["args"]["task_id"] for x in orphans])
         self.__relation_str = self.__convert_relation_to_string(relation) + f"\n{orphans}"
 
-    def get(self) -> str:
+    async def get(self) -> str:
         # Calling the functions to generate the source code string
         self.__generate_import_statements(self.__data["import_statements"])
         self.__generate_dag_statement(self.__data["dag_statement"])
-        self.__generate_operator_statements(self.__data["operators"], self.__data["dag_statement"]["dag_variable_name"])
-        self.__generate_global_string(self.__data["global"])
+        await self.__generate_operator_statements(
+            self.__data["operators"], self.__data["dag_statement"]["dag_variable_name"]
+        )
+        self.__generate_global_string(self.__data["global_statements"])
         self.__generate_relation_graph_string(
             self.__data["react_flow_data"]["edges"], operators=self.__data["operators"]
         )

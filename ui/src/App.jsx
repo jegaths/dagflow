@@ -11,7 +11,7 @@ export default function App() {
   const isCanvasEnabled = useRecoilValue(isCanvasEnabledState);
   return (
     <>
-      <ToastContainer />
+      <ToastContainer pauseOnFocusLoss={false} />
       <div className="flex font-display w-full">
         <Sidebar />
         {isCanvasEnabled ? <Pipeline /> : <Homepage />}

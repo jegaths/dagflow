@@ -106,7 +106,7 @@ const Details = () => {
         <div className={`${isDetailsPaneOpen == true ? "h-80" : "h-0"} transition-height duration-300 ease-in-out`}>
           <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 1 ? "h-full" : "h-0 hidden"}`}>
             <FloatingLabelInput label={"Pipeline Name"} arg_name="pipeline_name" className="mt-4 mb-4 text-primary" value={pipelineData.pipeline_name} onchange={handlePipelineDetailsChange} required={true} />
-            <FloatingEditor label={"Global"} arg_name={"global"} className="mb-6 text-primary" data={pipelineData.global} onchange={handlePipelineDetailsChange} height={"30vh"} />
+            <FloatingEditor label={"Global"} arg_name={"global_statements"} className="mb-6 text-primary" data={pipelineData.global_statements} onchange={handlePipelineDetailsChange} height={"30vh"} />
           </div>
 
           <div className={`bg-secondaryLight px-10 overflow-y-auto ${selectedTab == 3 ? "h-full" : "h-0 hidden"}`}>
@@ -119,10 +119,16 @@ const Details = () => {
             {selectedNodeId != undefined && pipelineData.operators[selectedNodeId] != undefined && (
               <div className="">
                 {Object.keys(pipelineData.operators[selectedNodeId]["args"]).map((arg, key) => {
-                  const isRequierd = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"])["args"][arg]["required"];
-                  const datatype = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"])["args"][arg]["data_type"];
+                  let isRequierd = false;
+                  let datatype = "string";
+                  const item = nodeDetails.find((obj) => obj.name == pipelineData.operators[selectedNodeId]["name"]);
+                  if (item != undefined && item["args"][arg] != undefined) {
+                    isRequierd = item["args"][arg]["required"];
+                    datatype = item["args"][arg]["data_type"];
+                  }
                   return <FloatingLabelInput key={key} label={arg} className="mt-4 mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["args"][arg]} onchange={handleArgsChange} required={isRequierd} type={datatype == "int" ? "number" : "text"} />;
                 })}
+
                 <FloatingLabelInput arg_name={"description"} label={"Description"} className="mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["description"]} onchange={handleOperatorDetailsChange} />
               </div>
             )}

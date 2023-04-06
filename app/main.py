@@ -1,17 +1,15 @@
-from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from utils.operators import get_operators
-from utils.generate_source_string import GenerateSourceString
-from utils.dag_to_dagflow import DagToDagFlow
-from pydantic import BaseModel
-from utils.source_to_json import SourceToJson
-from utils.json_to_source import JsonToSource
-import json
-import os
+from routers import dagflow
+from motor.motor_asyncio import AsyncIOMotorClient
+from utils.operators import generate_operators
+from utils.model.operator_model import Operator
+from fastapi.encoders import jsonable_encoder
+from pymongo import UpdateOne
+
+from utils.app import app
 
 origins = ["*"]
 
-app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,45 +20,39 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+async def startup_db_client():
+    print("Connecting to db..")
+    # Connecting to mongodb on startup and initializing the database. Need to generate the operator lists on startup.
+    # TODO: Have to take the operator list from somewhere else. Maybe a config file or something. Also have to create a list of default operators.
+    app.mongodb_client = AsyncIOMotorClient("mongodb://mongodb:27017/")
+    app.mongodb = app.mongodb_client.dagflow
+
+    collection = app.mongodb.get_collection("operators")
+    operators = [
+        {"id": 1, "name": "PythonOperator", "path": "airflow.operators.python"},
+        {"id": 2, "name": "BashOperator", "path": "airflow.operators.bash"},
+    ]
+
+    data = []
+    for operator in operators:
+        generated_operator = generate_operators(Operator.parse_obj(operator))
+        filter = {"id": generated_operator.id}
+        data.append(UpdateOne(filter, {"$set": jsonable_encoder(generated_operator)}, upsert=True))
+
+    await collection.bulk_write(data)
+    print("Filled operators..")
+
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    print("Closing db connection")
+    app.mongodb_client.close()
+
+
 @app.get("/")
 def root():
     return "Dagflow!"
 
 
-@app.get("/operators")
-def get_operator_list():
-    return get_operators()
-
-
-@app.get("/operators")
-def get_operator_list():
-    return get_operators()
-
-
-class Item(BaseModel):
-    data: dict
-
-
-@app.post("/generate_dag")
-def generate_dag(data: Item):
-    data = data.data
-    # Generating the python source code string
-    main_str = GenerateSourceString(data).get()
-    # Converting the python source code string to json
-    obj = SourceToJson(python_code_string=main_str).get()
-    # Loading the base dag json with default statements
-    with open("./utils/base_dag_json.json", "r") as f:
-        base_json = json.load(f)
-    # Extending base json with the created json
-    base_json["body"].extend(obj["body"])
-    # Converting the json back to python source code and saving as a file
-    JsonToSource(json_string=json.dumps(base_json, indent=4)).save(f"/dags/{data['pipeline_name']}.py")
-    return {"status": True}
-
-
-@app.post("/generate_flow")
-def generate_flow(file: UploadFile):
-    data = SourceToJson(python_code_string=file.file.read().decode("utf-8")).json_str()
-    dagflow = DagToDagFlow(json_string=data).get()
-    dagflow["pipeline_name"] = os.path.splitext(file.filename)[0]
-    return dagflow
+app.include_router(dagflow.router)
