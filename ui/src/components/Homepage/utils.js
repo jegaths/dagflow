@@ -29,7 +29,7 @@ export const handleFileSelect = (e, setInitialEdges, setInitialNodes, setImportS
           dag_statement: result.dag_statement,
           global_statements: result.global_statements,
           pipeline_name: result.pipeline_name == "" ? "df_pipeline_" + uuidv4().replace(/-/g, "_") : result.pipeline_name,
-          pipeline_id: uuidv4(),
+          pipeline_id: result.pipeline_id,
         }));
         setIsCanvasEnabled(true);
       })
@@ -70,9 +70,9 @@ export const getRecentPipelines = (setRecentPipelines) => {
       console.log(err);
     });
 };
-export const handleRecentPipelineClick = (pipelineId, setInitialEdges, setInitialNodes, setImportStatements, setPipelineData, setIsCanvasEnabled) => {
-  console.log(pipelineId);
 
+export const handleRecentPipelineClick = (pipelineId, setInitialEdges, setInitialNodes, setImportStatements, setPipelineData, setIsCanvasEnabled) => {
+  setIsCanvasEnabled(false);
   const requestOptions = {
     method: "POST",
     headers: { "Content-type": "application/json" },
@@ -84,14 +84,13 @@ export const handleRecentPipelineClick = (pipelineId, setInitialEdges, setInitia
       .then((res) => res.json())
       .then((result) => {
         resolve(result);
-        setPipelineData((prev) => ({
-          ...prev,
+        setPipelineData({
           operators: result.operators,
           dag_statement: result.dag_statement,
           global_statements: result.global_statements,
           pipeline_name: result.pipeline_name == "" ? "df_pipeline_" + uuidv4().replace(/-/g, "_") : result.pipeline_name,
           pipeline_id: result.pipeline_id,
-        }));
+        });
         setInitialEdges(result.react_flow_data.edges);
         setInitialNodes(result.react_flow_data.nodes);
         setImportStatements(result.import_statements);
@@ -108,17 +107,4 @@ export const handleRecentPipelineClick = (pipelineId, setInitialEdges, setInitia
     success: "Pipeline loaded successfully",
     error: "Some error occured!",
   });
-
-  //   const requestOptions = {
-  //     method: "GET",
-  //   };
-
-  //   fetch(`${BASE_URL}/dagflow/get_recent_pipeline_names/5`, requestOptions)
-  //     .then((res) => res.json())
-  //     .then((result) => {
-  //       setRecentPipelines(result);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
 };

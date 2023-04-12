@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import Optional
 
 COLLECTION = "pipeline"
@@ -49,6 +49,11 @@ class ReactFlowData(BaseModel):
 class DagStatement(BaseModel):
     dag_variable_name: str
     call: str
+
+    @validator("call")
+    def replace_text(cls, v):
+        # Add formatting to the dag statement
+        return v.replace("\n", "").replace(",", ",\n")
 
     class Config:
         schema_extra = {

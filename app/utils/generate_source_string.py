@@ -22,9 +22,6 @@ class GenerateSourceString:
             operator_args_str = f"""{operator['name']}("""
             for k, v in operator["args"].items():
                 if v != "":
-                    print("**" * 10)
-                    print(args[f'{operator["name"]}'])
-                    print("**" * 10)
                     # finding the datatype for the particular argument. If integer render without quotes
                     # TODO: Currenly quote removal is added only for integer values. For other datatypes quotes are default. Need to test on other datatypes and update accordingly
                     arg_type = (

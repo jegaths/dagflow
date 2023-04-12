@@ -48,7 +48,7 @@ def get_default_args_v2(func) -> dict[str, Args]:
 
 
 def generate_operators(operator: Operator) -> Operator:
-    imported_operator = import_from(operator.path, operator.name)
+    imported_operator = import_from(operator.import_path, operator.name)
     operator_info = get_default_args_v2(imported_operator.__init__)
     operator.args = {**operator.args, **operator_info}
     return operator

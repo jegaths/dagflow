@@ -1,6 +1,10 @@
 import json
 from utils.json_to_source import JsonToSource
 from utils.operators import get_operator_details
+from utils.model.pipeline_model import Pipeline
+import uuid
+
+uid = uuid.uuid4()
 
 
 class DagToDagFlow:
@@ -189,9 +193,8 @@ class DagToDagFlow:
                 "args": __generate_args(item["value"]["keywords"], operators_details[operator_name]["args"]),
                 "description": "",
             }
-        # print(operators_details)
 
-    async def generate_dagflow(self):
+    async def generate_dagflow(self) -> Pipeline:
         self.__seperate_source_json(self.__json_data)
         for binop_statement in self.seperated_statements["binop_statements"]:
             self.__edges.extend(self.__extract_edge_source_target_pairs(binop_statement["value"]))
@@ -203,8 +206,9 @@ class DagToDagFlow:
         self.__generate_global_staments(self.seperated_statements["global_statments"])
         await self.__generate_nodes_and_operators(self.seperated_statements["operator_statments"])
 
-        return {
+        res = {
             "pipeline_name": "",
+            "pipeline_id": str(uid),
             "global_statements": self.__global_statements,
             "operators": self.__operators,
             "react_flow_data": {
@@ -216,16 +220,4 @@ class DagToDagFlow:
             "dag_statement": self.__dag_statement,
         }
 
-    # def get(self) -> dict:
-    #     return {
-    #         "pipeline_name": "",
-    #         "global_statements": self.__global_statements,
-    #         "operators": self.__operators,
-    #         "react_flow_data": {
-    #             "nodes": self.__nodes,
-    #             "edges": self.__edges,
-    #             "viewport": {"x": 0, "y": 0, "zoom": 1},
-    #         },
-    #         "import_statements": self.__import_statements,
-    #         "dag_statement": self.__dag_statement,
-    #     }
+        return Pipeline(**{"data": res})
