@@ -12,6 +12,7 @@ export const getSidebarData = (setMenuItems) => {
       const subMenuItems = result.map((item) => {
         return { title: item.pipeline_name, isSelected: false, id: item.pipeline_id };
       });
+      console.log(subMenuItems);
       setMenuItems([
         {
           title: "Pipelines",
@@ -32,6 +33,19 @@ export const handleExpandMainmenuItem = (index, setMenuItems) => {
     {
       ...prevItems[index], // spread the properties of the first element
       isSelected: !prevItems[index]["isSelected"], // update the isSelected property
+    },
+    ...prevItems.slice(1), // spread the remaining elements
+  ]);
+};
+
+export const handleSubmenuItemSelection = (index, subIndex, setMenuItems) => {
+  // Set the state of submenu item with subIndex to true and rest to false
+  setMenuItems((prevItems) => [
+    {
+      ...prevItems[index], // spread the properties of the first element
+      subMenuItems: prevItems[index]["subMenuItems"].map((item, i) => {
+        return { ...item, isSelected: i === subIndex };
+      }),
     },
     ...prevItems.slice(1), // spread the remaining elements
   ]);

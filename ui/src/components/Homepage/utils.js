@@ -107,17 +107,4 @@ export const handleRecentPipelineClick = (pipelineId, setInitialEdges, setInitia
     success: "Pipeline loaded successfully",
     error: "Some error occured!",
   });
-
-  // const requestOptions = {
-  //   method: "GET",
-  // };
-
-  // fetch(`${BASE_URL}/dagflow/get_recent_pipeline_names/5`, requestOptions)
-  //   .then((res) => res.json())
-  //   .then((result) => {
-  //     setRecentPipelines(result);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
 };

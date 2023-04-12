@@ -2,9 +2,8 @@ import React, { useEffect } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { menuItemState, toggleSidebarState } from "./atoms";
 import { FiChevronDown } from "react-icons/fi";
-import { FaCircle } from "react-icons/fa";
 import { BiCollapseHorizontal } from "react-icons/bi";
-import { getSidebarData, handleExpandMainmenuItem } from "./utils";
+import { getSidebarData, handleExpandMainmenuItem, handleSubmenuItemSelection } from "./utils";
 import { isCanvasEnabledState } from "../../atoms";
 import { initialNodesState, intialEdgesState, pipelineState, importStatementState } from "../Pipeline/atoms";
 import { handleRecentPipelineClick } from "../Homepage/utils";
@@ -55,8 +54,20 @@ const Sidebar = () => {
                   <ul className="">
                     {item.subMenuItems.map((subItem, subIndex) => {
                       return (
-                        <li onClick={item.title == "Pipelines" ? () => handleRecentPipelineClick(subItem.id, setInitialEdges, setInitialNodes, setImportStatements, setPipelineData, setIsCanvasEnabled) : null} key={subIndex} title={subItem.title} className={`${item.isSelected ? "visible" : "hidden"} transition-all duration-300 ease-in-out flex gap-2 w-56 truncate cursor-pointer items-center pl-12 mb-1 rounded-md py-3 px-2 mx-3 ${subItem.isSelected ? " text-white" : "text-muted"} `}>
-                          {subItem.isSelected && <FaCircle className="text-white" size="0.5rem" />}
+                        <li
+                          onClick={
+                            item.title == "Pipelines"
+                              ? () => {
+                                  handleRecentPipelineClick(subItem.id, setInitialEdges, setInitialNodes, setImportStatements, setPipelineData, setIsCanvasEnabled);
+                                  handleSubmenuItemSelection(index, subIndex, setMenuItems);
+                                }
+                              : null
+                          }
+                          key={subIndex}
+                          title={subItem.title}
+                          className={`${item.isSelected ? "visible" : "hidden"} transition-all duration-300 ease-in-out flex gap-2 w-56 truncate cursor-pointer items-center pl-12 mb-1 rounded-md py-3 px-2 mx-3 ${subItem.isSelected ? " text-white" : "text-muted"} `}>
+                          {/* {subItem.isSelected && <FaCircle className="text-white" size="0.5rem" />} */}
+                          {subItem.isSelected}
                           {subItem.title}
                         </li>
                       );
