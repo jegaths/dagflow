@@ -56,21 +56,20 @@ async def generate_flow(file: UploadFile):
     data = SourceToJson(python_code_string=file.file.read().decode("utf-8")).json_str()
     dagflow = DagToDagFlow(json_string=data)
     dagflow = await dagflow.generate_dagflow()
-    dagflow["pipeline_name"] = os.path.splitext(file.filename)[0]
-    return dagflow
+    dagflow.data.pipeline_name = os.path.splitext(file.filename)[0]
+    return dagflow.data
 
 
 @router.post("/save_pipeline")
 async def save_pipeline(request: Request, pipeline: Pipeline):
     pipeline = pipeline.data
-
     collection = request.app.mongodb.get_collection(COLLECTION)
     filter = {"pipeline_id": pipeline.pipeline_id}
     data = jsonable_encoder(pipeline)
     data["updated_at"] = datetime.datetime.now().isoformat()
     result = await collection.update_one(filter, {"$set": jsonable_encoder(data)}, upsert=True)
-    print("Number of documents matched: ", result.matched_count)
-    print("Number of documents modified: ", result.modified_count)
+    # print("Number of documents matched: ", result.matched_count)
+    # print("Number of documents modified: ", result.modified_count)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={"message": "Pipeline saved successfully", "pipeline": pipeline.pipeline_name},

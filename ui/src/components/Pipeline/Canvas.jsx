@@ -25,6 +25,7 @@ const Canvas = () => {
   const setSelectedNodeId = useSetRecoilState(selectedNodeState);
   const [importStatement, setImportStatement] = useRecoilState(importStatementState);
   const [pipelineData, setPipelineData] = useRecoilState(pipelineState);
+
   const onConnect = useCallback((params) => {
     // Make the edges animated
     params["animated"] = true;
@@ -112,7 +113,7 @@ const Canvas = () => {
   });
 
   return (
-    <div className="flex flex-col w-full">
+    <div className={`flex flex-col w-full`}>
       <div className="flex flex-row">
         <ReactFlowProvider>
           <div className="reactflow-wrapper w-full h-full" style={{ height: "82vh", width: "100%" }} ref={reactFlowWrapper}>

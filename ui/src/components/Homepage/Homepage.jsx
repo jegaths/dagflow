@@ -8,9 +8,9 @@ import { recentPipelinesState } from "./atoms";
 const Homepage = () => {
   const setInitialEdges = useSetRecoilState(intialEdgesState);
   const setInitialNodes = useSetRecoilState(initialNodesState);
+  const setImportStatements = useSetRecoilState(importStatementState);
   const setPipelineData = useSetRecoilState(pipelineState);
   const setIsCanvasEnabled = useSetRecoilState(isCanvasEnabledState);
-  const setImportStatements = useSetRecoilState(importStatementState);
   const [recentPipelines, setRecentPipelines] = useRecoilState(recentPipelinesState);
 
   const inputFile = useRef(null);

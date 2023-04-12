@@ -10,6 +10,6 @@ class Args(BaseModel):
 class Operator(BaseModel):
     id: int
     name: str
-    path: str
+    import_path: str
     node_type: str = "operator"
     args: dict[str, Args] = {"task_id": Args(default_argument="", data_type="string", required=True)}

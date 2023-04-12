@@ -30,8 +30,8 @@ async def startup_db_client():
 
     collection = app.mongodb.get_collection("operators")
     operators = [
-        {"id": 1, "name": "PythonOperator", "path": "airflow.operators.python"},
-        {"id": 2, "name": "BashOperator", "path": "airflow.operators.bash"},
+        {"id": 1, "name": "PythonOperator", "import_path": "airflow.operators.python"},
+        {"id": 2, "name": "BashOperator", "import_path": "airflow.operators.bash"},
     ]
 
     data = []

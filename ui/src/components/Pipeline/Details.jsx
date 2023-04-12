@@ -16,7 +16,7 @@ const Details = () => {
   const ref = useRef();
 
   useEffect(() => {
-    setFormRef(ref);
+    setFormRef(ref.current);
   }, [ref]);
 
   const handlePipelineDetailsChange = (data, key) => {
