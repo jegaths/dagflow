@@ -27,7 +27,7 @@ const Nodes = () => {
   };
 
   return (
-    <div className="overflow-auto">
+    <div className="overflow-auto max-h-96">
       <ul className="w-48 text-sm font-medium text-gray-900 bg-white"></ul>
       {nodeList.map((item, index) => (
         <li key={index} className="w-full px-4 list-none">
