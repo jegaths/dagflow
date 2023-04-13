@@ -82,28 +82,48 @@ def get_operator_list() -> list[str]:
                             # Return the name of the class
                             return node.name
 
-    modules = [Modules(**{"module": "airflow", "sub_module": "operators"})]
-    operators_dir = os.path.join(
-        os.path.dirname(importlib.import_module(modules[0].module).__file__), modules[0].sub_module
-    )
+    def find_operators_folder(base_dir):
+        operator_dirs = []
+        for dirpath, dirnames, _ in os.walk(base_dir):
+            if "operators" in dirnames:
+                operator_dirs.append(
+                    Modules(
+                        **{
+                            "module": f'airflow.providers.{dirpath.split("providers/",1)[1].replace("/",".")}',
+                            "sub_module": "operators",
+                        }
+                    )
+                )
+        return operator_dirs
 
+    def get_operator_list_from_dir(operator, operator_lists):
+        operators_dir = os.path.join(
+            os.path.dirname(importlib.import_module(operator.module).__file__), operator.sub_module
+        )
+        for file_name in os.listdir(operators_dir):
+            # Skip non-Python files and __init__.py
+            if not file_name.endswith(".py") or file_name == "__init__.py":
+                continue
+
+            class_name = get_class_name(operators_dir + "/" + file_name)
+            file_name_without_extension = os.path.splitext(file_name)[0]
+            if class_name != None:
+                import_path = operator.module + "." + operator.sub_module + "." + file_name_without_extension
+                operator_lists.append(
+                    {
+                        "id": f"{file_name_without_extension}_{import_path}",
+                        "name": class_name,
+                        "import_path": import_path,
+                    }
+                )
+
+    core_operator = Modules(**{"module": "airflow", "sub_module": "operators"})
     operator_lists = []
+    get_operator_list_from_dir(core_operator, operator_lists)
 
-    index = 1
-    for file_name in os.listdir(operators_dir):
-        # Skip non-Python files and __init__.py
-        if not file_name.endswith(".py") or file_name == "__init__.py":
-            continue
-
-        class_name = get_class_name(operators_dir + "/" + file_name)
-        file_name_without_extension = os.path.splitext(file_name)[0]
-        if class_name != None:
-            operator_lists.append(
-                {
-                    "id": index,
-                    "name": class_name,
-                    "import_path": modules[0].module + "." + modules[0].sub_module + "." + file_name_without_extension,
-                }
-            )
-            index += 1
+    provider_operator = find_operators_folder(
+        os.path.join(os.path.dirname(importlib.import_module("airflow").__file__), "providers")
+    )
+    for provider in provider_operator:
+        get_operator_list_from_dir(provider, operator_lists)
     return operator_lists

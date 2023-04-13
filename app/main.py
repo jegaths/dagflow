@@ -32,11 +32,6 @@ async def startup_db_client():
 
     collection = app.mongodb.get_collection("operators")
     operators = get_operator_list()
-    # operators = [
-    #     {"id": 1, "name": "PythonOperator", "import_path": "airflow.operators.python"},
-    #     {"id": 2, "name": "BashOperator", "import_path": "airflow.operators.bash"},
-    # ]
-
     data = []
     for operator in operators:
         generated_operator, status = generate_operators(Operator.parse_obj(operator))

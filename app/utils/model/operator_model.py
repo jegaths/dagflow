@@ -8,7 +8,7 @@ class Args(BaseModel):
 
 
 class Operator(BaseModel):
-    id: int
+    id: str
     name: str
     import_path: str
     node_type: str = "operator"
