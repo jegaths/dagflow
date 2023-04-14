@@ -26,7 +26,7 @@ const isInputsValid = (formRef, pipelineData) => {
   return isValid;
 };
 
-export const savePipeline = (pipelineData, reactFlowInstance, importStatement, formRef) => {
+export const savePipeline = (pipelineData, reactFlowInstance, importStatement, formRef, setRefreshSidebarState) => {
   const isValid = isInputsValid(formRef, pipelineData);
 
   if (!isValid) toast.warn("All the requierd fields are not filled!");
@@ -46,6 +46,7 @@ export const savePipeline = (pipelineData, reactFlowInstance, importStatement, f
       .then((res) => res.json())
       .then((result) => {
         resolve(result);
+        setRefreshSidebarState((prevState) => !prevState);
         console.log(result);
       })
       .catch((err) => {
@@ -57,6 +58,44 @@ export const savePipeline = (pipelineData, reactFlowInstance, importStatement, f
   toast.promise(myPromise, {
     pending: "Saving Pipeline",
     success: "Pipeline saved successfully",
+    error: "Some error occured!",
+  });
+};
+
+export const deletePipeline = (pipelineId, setCanvasEnabled, setPipelineData, setRefreshSidebarState, setInitialEdges, setInitialNodes) => {
+  const requestOptions = {
+    method: "DELETE",
+    headers: { "Content-type": "application/json" },
+  };
+
+  const myPromise = new Promise((resolve, reject) =>
+    fetch(`${BASE_URL}/dagflow/delete_pipeline/${pipelineId}`, requestOptions)
+      .then((res) => res.json())
+      .then((result) => {
+        setPipelineData({
+          pipeline_name: "",
+          pipeline_id: "",
+          global_statements: "",
+          operators: {},
+          react_flow_data: {},
+          dag_statement: {},
+        });
+        setRefreshSidebarState((prevState) => !prevState);
+        setCanvasEnabled(false);
+        setInitialEdges([]);
+        setInitialNodes([]);
+        resolve(result);
+        console.log(result);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject();
+      })
+  );
+
+  toast.promise(myPromise, {
+    pending: "Deleting Pipeline",
+    success: "Pipeline deleted successfully",
     error: "Some error occured!",
   });
 };

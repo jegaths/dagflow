@@ -67,6 +67,7 @@ def get_operator_list() -> list[str]:
         module: str
         sub_module: str
 
+    # Function to get the name of the class from a Python file which inherits from BaseOperator
     def get_class_name(file_path):
         with open(file_path, "r") as file:
             # Parse the Python file as an abstract syntax tree (AST)
@@ -82,6 +83,7 @@ def get_operator_list() -> list[str]:
                             # Return the name of the class
                             return node.name
 
+    # Function to find folders which have a subfolder called operators
     def find_operators_folder(base_dir):
         operator_dirs = []
         for dirpath, dirnames, _ in os.walk(base_dir):
@@ -96,6 +98,7 @@ def get_operator_list() -> list[str]:
                 )
         return operator_dirs
 
+    # Function to get the list of operators from a directory
     def get_operator_list_from_dir(operator, operator_lists):
         operators_dir = os.path.join(
             os.path.dirname(importlib.import_module(operator.module).__file__), operator.sub_module
@@ -117,10 +120,12 @@ def get_operator_list() -> list[str]:
                     }
                 )
 
+    # Generate operators from core module
     core_operator = Modules(**{"module": "airflow", "sub_module": "operators"})
     operator_lists = []
     get_operator_list_from_dir(core_operator, operator_lists)
 
+    # Generate operators from providers module
     provider_operator = find_operators_folder(
         os.path.join(os.path.dirname(importlib.import_module("airflow").__file__), "providers")
     )

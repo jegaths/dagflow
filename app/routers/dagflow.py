@@ -104,3 +104,19 @@ async def get_pipelines(request: Request, pipeline: dict):
     except ValueError as e:
         print(str(e))
     return data.data
+
+
+# @router.post("/delete_pipeline")
+# async def delete_pipeline(request: Request, pipeline_id: str):
+#     collection = request.app.mongodb.get_collection(COLLECTION)
+#     query = {"pipeline_id": pipeline_id}
+#     result = await collection.delete_one(query)
+#     return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Pipeline deleted successfully"})
+
+
+@router.delete("/delete_pipeline/{pipeline_id}")
+async def delete_pipeline(request: Request, pipeline_id: str):
+    collection = request.app.mongodb.get_collection(COLLECTION)
+    query = {"pipeline_id": pipeline_id}
+    result = await collection.delete_one(query)
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Pipeline deleted successfully"})

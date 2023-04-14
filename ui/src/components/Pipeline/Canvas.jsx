@@ -7,9 +7,11 @@ import "reactflow/dist/style.css";
 
 import Nodes, { nodeTypes } from "./Nodes";
 
-import { useRecoilState, useSetRecoilState, useRecoilValue } from "recoil";
-import { pipelineState, selectedNodeState, reactFlowState, importStatementState, initialNodesState, intialEdgesState } from "./atoms";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { pipelineState, selectedNodeState, reactFlowState, importStatementState, initialNodesState, intialEdgesState, refreshSidebarState } from "./atoms";
 import { v4 as uuidv4 } from "uuid";
+import { deletePipeline } from "./utils";
+import { isCanvasEnabledState } from "../../atoms";
 
 const getId = () => {
   return "op_" + uuidv4().replace(/-/g, "_");
@@ -17,14 +19,16 @@ const getId = () => {
 
 const Canvas = () => {
   const reactFlowWrapper = useRef(null);
-  const initialEdges = useRecoilValue(intialEdgesState);
-  const initialNodes = useRecoilValue(initialNodesState);
+  const [initialEdges, setInitialEdges] = useRecoilState(intialEdgesState);
+  const [initialNodes, setInitialNodes] = useRecoilState(initialNodesState);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [reactFlowInstance, setReactFlowInstance] = useRecoilState(reactFlowState);
   const setSelectedNodeId = useSetRecoilState(selectedNodeState);
   const [importStatement, setImportStatement] = useRecoilState(importStatementState);
   const [pipelineData, setPipelineData] = useRecoilState(pipelineState);
+  const setCanvasEnabled = useSetRecoilState(isCanvasEnabledState);
+  const setRefreshSidebarState = useSetRecoilState(refreshSidebarState);
 
   const onConnect = useCallback((params) => {
     // Make the edges animated
@@ -70,7 +74,6 @@ const Canvas = () => {
       y: event.clientY - reactFlowBounds.top,
     });
     let parsedData = JSON.parse(data);
-    // const id = `${parsedData.name}_${node_id}_${getId()}`;
     const id = getId();
     const newNode = {
       id: id,
@@ -121,7 +124,7 @@ const Canvas = () => {
               <Background className="bg-secondaryLight" variant="dots" size={3} gap={40} />
               <Controls showInteractive={false} position="top-right">
                 <ControlButton>
-                  <AiFillDelete />
+                  <AiFillDelete onClick={() => deletePipeline(pipelineData.pipeline_id, setCanvasEnabled, setPipelineData, setRefreshSidebarState, setInitialEdges, setInitialNodes)} />
                 </ControlButton>
               </Controls>
               <Panel position="top-left" className="bg-white rounded-md shadow-md">
