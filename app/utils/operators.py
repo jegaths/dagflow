@@ -1,8 +1,11 @@
 import inspect
 
+import pydantic
 from utils.model.operator_model import Operator, Args
-
 from utils.app import app
+import ast
+import os
+import importlib
 
 
 def import_from(filename, functionName):
@@ -47,8 +50,85 @@ def get_default_args_v2(func) -> dict[str, Args]:
     return res
 
 
-def generate_operators(operator: Operator) -> Operator:
-    imported_operator = import_from(operator.import_path, operator.name)
-    operator_info = get_default_args_v2(imported_operator.__init__)
-    operator.args = {**operator.args, **operator_info}
-    return operator
+def generate_operators(operator: Operator) -> tuple[Operator, bool]:
+    status = False
+    try:
+        imported_operator = import_from(operator.import_path, operator.name)
+        operator_info = get_default_args_v2(imported_operator.__init__)
+        operator.args = {**operator.args, **operator_info}
+        status = True
+    except ModuleNotFoundError:
+        print(f"ModuleNotFoundError => {operator.name}")
+    return operator, status
+
+
+def get_operator_list() -> list[str]:
+    class Modules(pydantic.BaseModel):
+        module: str
+        sub_module: str
+
+    # Function to get the name of the class from a Python file which inherits from BaseOperator
+    def get_class_name(file_path):
+        with open(file_path, "r") as file:
+            # Parse the Python file as an abstract syntax tree (AST)
+            tree = ast.parse(file.read())
+
+            # Iterate through all nodes in the AST
+            for node in tree.body:
+                # Check if the node is a class definition
+                if isinstance(node, ast.ClassDef):
+                    for base in node.bases:
+                        # Check if the base class is BaseOperator
+                        if isinstance(base, ast.Name) and base.id == "BaseOperator":
+                            # Return the name of the class
+                            return node.name
+
+    # Function to find folders which have a subfolder called operators
+    def find_operators_folder(base_dir):
+        operator_dirs = []
+        for dirpath, dirnames, _ in os.walk(base_dir):
+            if "operators" in dirnames:
+                operator_dirs.append(
+                    Modules(
+                        **{
+                            "module": f'airflow.providers.{dirpath.split("providers/",1)[1].replace("/",".")}',
+                            "sub_module": "operators",
+                        }
+                    )
+                )
+        return operator_dirs
+
+    # Function to get the list of operators from a directory
+    def get_operator_list_from_dir(operator, operator_lists):
+        operators_dir = os.path.join(
+            os.path.dirname(importlib.import_module(operator.module).__file__), operator.sub_module
+        )
+        for file_name in os.listdir(operators_dir):
+            # Skip non-Python files and __init__.py
+            if not file_name.endswith(".py") or file_name == "__init__.py":
+                continue
+
+            class_name = get_class_name(operators_dir + "/" + file_name)
+            file_name_without_extension = os.path.splitext(file_name)[0]
+            if class_name != None:
+                import_path = operator.module + "." + operator.sub_module + "." + file_name_without_extension
+                operator_lists.append(
+                    {
+                        "id": f"{file_name_without_extension}_{import_path}",
+                        "name": class_name,
+                        "import_path": import_path,
+                    }
+                )
+
+    # Generate operators from core module
+    core_operator = Modules(**{"module": "airflow", "sub_module": "operators"})
+    operator_lists = []
+    get_operator_list_from_dir(core_operator, operator_lists)
+
+    # Generate operators from providers module
+    provider_operator = find_operators_folder(
+        os.path.join(os.path.dirname(importlib.import_module("airflow").__file__), "providers")
+    )
+    for provider in provider_operator:
+        get_operator_list_from_dir(provider, operator_lists)
+    return operator_lists

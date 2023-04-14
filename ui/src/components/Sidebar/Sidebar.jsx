@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { menuItemState, toggleSidebarState } from "./atoms";
 import { FiChevronDown } from "react-icons/fi";
 import { BiCollapseHorizontal } from "react-icons/bi";
 import { getSidebarData, handleExpandMainmenuItem, handleSubmenuItemSelection } from "./utils";
 import { isCanvasEnabledState } from "../../atoms";
-import { initialNodesState, intialEdgesState, pipelineState, importStatementState } from "../Pipeline/atoms";
+import { initialNodesState, intialEdgesState, pipelineState, importStatementState, refreshSidebarState } from "../Pipeline/atoms";
 import { handleRecentPipelineClick } from "../Homepage/utils";
 
 const Sidebar = () => {
@@ -15,12 +15,14 @@ const Sidebar = () => {
   const setInitialEdges = useSetRecoilState(intialEdgesState);
   const setInitialNodes = useSetRecoilState(initialNodesState);
   const setImportStatements = useSetRecoilState(importStatementState);
-  const setPipelineData = useSetRecoilState(pipelineState);
+  // const setPipelineData = useSetRecoilState(pipelineState);
+  const [pipelineData, setPipelineData] = useRecoilState(pipelineState);
   const setIsCanvasEnabled = useSetRecoilState(isCanvasEnabledState);
+  const refreshSidebar = useRecoilValue(refreshSidebarState);
 
   useEffect(() => {
     getSidebarData(setMenuItems);
-  }, []);
+  }, [refreshSidebar]);
 
   return (
     <div className={`min-h-screen flex flex-col ${toggleSidebar ? "w-96" : "w-20"} bg-primary transition-height duration-300 ease-in-out`}>

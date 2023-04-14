@@ -12,7 +12,6 @@ export const getSidebarData = (setMenuItems) => {
       const subMenuItems = result.map((item) => {
         return { title: item.pipeline_name, isSelected: false, id: item.pipeline_id };
       });
-      console.log(subMenuItems);
       setMenuItems([
         {
           title: "Pipelines",
