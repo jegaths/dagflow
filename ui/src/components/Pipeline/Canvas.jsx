@@ -8,10 +8,11 @@ import "reactflow/dist/style.css";
 import Nodes, { nodeTypes } from "./Nodes";
 
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { pipelineState, selectedNodeState, reactFlowState, importStatementState, initialNodesState, intialEdgesState, refreshSidebarState } from "./atoms";
+import { pipelineState, selectedNodeState, reactFlowState, importStatementState, initialNodesState, intialEdgesState, refreshSidebarState, deletePipelineModelState } from "./atoms";
 import { v4 as uuidv4 } from "uuid";
 import { deletePipeline } from "./utils";
 import { isCanvasEnabledState } from "../../atoms";
+import DeletePipelineModal from "./Modal";
 
 const getId = () => {
   return "op_" + uuidv4().replace(/-/g, "_");
@@ -29,6 +30,7 @@ const Canvas = () => {
   const [pipelineData, setPipelineData] = useRecoilState(pipelineState);
   const setCanvasEnabled = useSetRecoilState(isCanvasEnabledState);
   const setRefreshSidebarState = useSetRecoilState(refreshSidebarState);
+  const [deletePipelineModel, setDeletePipelineModel] = useRecoilState(deletePipelineModelState);
 
   const onConnect = useCallback((params) => {
     // Make the edges animated
@@ -115,8 +117,14 @@ const Canvas = () => {
     setSelectedNodeId(id);
   });
 
+  const handleDeletePipeline = () => {
+    deletePipeline(pipelineData.pipeline_id, setCanvasEnabled, setPipelineData, setRefreshSidebarState, setInitialEdges, setInitialNodes);
+    setDeletePipelineModel(false);
+  };
+
   return (
     <div className={`flex flex-col w-full`}>
+      {deletePipelineModel && <DeletePipelineModal setCancel={setDeletePipelineModel} setDone={handleDeletePipeline} />}
       <div className="flex flex-row">
         <ReactFlowProvider>
           <div className="reactflow-wrapper w-full h-full" style={{ height: "82vh", width: "100%" }} ref={reactFlowWrapper}>
@@ -124,7 +132,8 @@ const Canvas = () => {
               <Background className="bg-secondaryLight" variant="dots" size={3} gap={40} />
               <Controls showInteractive={false} position="top-right">
                 <ControlButton>
-                  <AiFillDelete onClick={() => deletePipeline(pipelineData.pipeline_id, setCanvasEnabled, setPipelineData, setRefreshSidebarState, setInitialEdges, setInitialNodes)} />
+                  <AiFillDelete onClick={() => setDeletePipelineModel(true)} />
+                  {/* <AiFillDelete onClick={() => deletePipeline(pipelineData.pipeline_id, setCanvasEnabled, setPipelineData, setRefreshSidebarState, setInitialEdges, setInitialNodes)} /> */}
                 </ControlButton>
               </Controls>
               <Panel position="top-left" className="bg-white rounded-md shadow-md">

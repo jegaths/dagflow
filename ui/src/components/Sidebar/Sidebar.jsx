@@ -15,8 +15,7 @@ const Sidebar = () => {
   const setInitialEdges = useSetRecoilState(intialEdgesState);
   const setInitialNodes = useSetRecoilState(initialNodesState);
   const setImportStatements = useSetRecoilState(importStatementState);
-  // const setPipelineData = useSetRecoilState(pipelineState);
-  const [pipelineData, setPipelineData] = useRecoilState(pipelineState);
+  const setPipelineData = useSetRecoilState(pipelineState);
   const setIsCanvasEnabled = useSetRecoilState(isCanvasEnabledState);
   const refreshSidebar = useRecoilValue(refreshSidebarState);
 

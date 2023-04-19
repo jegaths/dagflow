@@ -15,6 +15,11 @@ export const refreshSidebarState = atom({
   default: false,
 });
 
+export const deletePipelineModelState = atom({
+  key: "deletePipelineModelState",
+  default: false,
+});
+
 export const pipelineState = atom({
   key: "pipelineState",
   default: {
