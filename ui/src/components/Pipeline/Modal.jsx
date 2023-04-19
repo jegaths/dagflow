@@ -4,7 +4,7 @@ import { AiOutlineWarning } from "react-icons/ai"; // Import the AiOutlineWarnin
 // eslint-disable-next-line react/prop-types
 const DeletePipelineModal = ({ setCancel, setDone }) => {
   return (
-    <div className="fixed z-10 inset-0 bg-black bg-opacity-25 backdrop-blur-sm backdrop-brightness-50 flex items-center justify-center">
+    <div className="fixed z-20 inset-0 bg-black bg-opacity-25 backdrop-blur-sm backdrop-brightness-50 flex items-center justify-center">
       <div className="bg-white p-2 rounded w-96 py-5 px-5">
         <div className="flex items-center justify-center">
           <AiOutlineWarning className="text-red-500 text-5xl mr-4" />

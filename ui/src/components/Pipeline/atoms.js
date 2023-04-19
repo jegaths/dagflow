@@ -66,3 +66,8 @@ export const formRefState = atom({
   key: "formRefState",
   default: null,
 });
+
+export const nodesSearchState = atom({
+  key: "nodesSearchState",
+  default: "",
+});
