@@ -133,7 +133,6 @@ const Canvas = () => {
               <Controls showInteractive={false} position="top-right">
                 <ControlButton>
                   <AiFillDelete onClick={() => setDeletePipelineModel(true)} />
-                  {/* <AiFillDelete onClick={() => deletePipeline(pipelineData.pipeline_id, setCanvasEnabled, setPipelineData, setRefreshSidebarState, setInitialEdges, setInitialNodes)} /> */}
                 </ControlButton>
               </Controls>
               <Panel position="top-left" className="bg-white rounded-md shadow-md">
