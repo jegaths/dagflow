@@ -1,6 +1,21 @@
 import { BASE_URL } from "../../constants";
 import { TiFlowMerge } from "react-icons/ti";
 
+export const handleLogoClick = (setIsCanvasEnabled, setInitialNodes, setInitialEdges, setImportStatements, setPipelineData) => {
+  setInitialNodes([]);
+  setInitialEdges([]);
+  setImportStatements("from airflow import DAG\nfrom airflow.utils.dates import days_ago\nfrom datetime import timedelta");
+  setPipelineData({
+    pipeline_name: "",
+    pipeline_id: "",
+    global_statements: "",
+    operators: {},
+    react_flow_data: {},
+    dag_statement: {},
+  });
+  setIsCanvasEnabled(false);
+};
+
 export const getSidebarData = (setMenuItems) => {
   const requestOptions = {
     method: "GET",
@@ -16,7 +31,7 @@ export const getSidebarData = (setMenuItems) => {
         {
           title: "Pipelines",
           icon: TiFlowMerge,
-          isSelected: true,
+          isSelected: false,
           haveSubmenu: true,
           subMenuItems: subMenuItems,
         },

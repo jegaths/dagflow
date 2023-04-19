@@ -3,7 +3,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { menuItemState, toggleSidebarState } from "./atoms";
 import { FiChevronDown } from "react-icons/fi";
 import { BiCollapseHorizontal } from "react-icons/bi";
-import { getSidebarData, handleExpandMainmenuItem, handleSubmenuItemSelection } from "./utils";
+import { getSidebarData, handleExpandMainmenuItem, handleSubmenuItemSelection, handleLogoClick } from "./utils";
 import { isCanvasEnabledState } from "../../atoms";
 import { initialNodesState, intialEdgesState, pipelineState, importStatementState, refreshSidebarState } from "../Pipeline/atoms";
 import { handleRecentPipelineClick } from "../Homepage/utils";
@@ -25,7 +25,7 @@ const Sidebar = () => {
 
   return (
     <div className={`min-h-screen flex flex-col ${toggleSidebar ? "w-96" : "w-20"} bg-primary transition-height duration-300 ease-in-out`}>
-      <div className="flex flex-col justify-between mt-6 pb-5 px-3">
+      <div className="flex flex-col justify-between mt-6 pb-5 px-3 cursor-pointer" onClick={() => handleLogoClick(setIsCanvasEnabled, setInitialNodes, setInitialEdges, setImportStatements, setPipelineData)}>
         {toggleSidebar && <div className="logo text-3xl px-3 font-bold text-secondary">dagflow</div>}
         {!toggleSidebar && <div className="text-primary text-4xl font-bold self-center bg-secondary px-4 py-1 rounded-lg">d</div>}
       </div>
