@@ -6,6 +6,7 @@ from utils.app import app
 import ast
 import os
 import importlib
+import json
 
 
 def import_from(filename, functionName):
@@ -67,21 +68,27 @@ def get_operator_list() -> list[str]:
         module: str
         sub_module: str
 
+    base_inherited_classes = ["BaseOperator", "GoogleCloudBaseOperator"]
+
     # Function to get the name of the class from a Python file which inherits from BaseOperator
-    def get_class_name(file_path):
+    def get_class_name(file_path) -> list[str]:
+        ops_list = []
         with open(file_path, "r") as file:
             # Parse the Python file as an abstract syntax tree (AST)
+            # print(file.read())
             tree = ast.parse(file.read())
-
             # Iterate through all nodes in the AST
             for node in tree.body:
                 # Check if the node is a class definition
                 if isinstance(node, ast.ClassDef):
                     for base in node.bases:
                         # Check if the base class is BaseOperator
-                        if isinstance(base, ast.Name) and base.id == "BaseOperator":
+                        # if isinstance(base, ast.Name) and base.id in base_inherited_classes:
+                        if isinstance(base, ast.Name) and "operator" in base.id.lower():
                             # Return the name of the class
-                            return node.name
+                            ops_list.append(node.name)
+                            # return node.name
+        return ops_list
 
     # Function to find folders which have a subfolder called operators
     def find_operators_folder(base_dir):
@@ -108,13 +115,26 @@ def get_operator_list() -> list[str]:
             if not file_name.endswith(".py") or file_name == "__init__.py":
                 continue
 
-            class_name = get_class_name(operators_dir + "/" + file_name)
             file_name_without_extension = os.path.splitext(file_name)[0]
-            if class_name != None:
+            # if(file_name_without_extension == "postgres"):
+            #     print("************************")
+            #     print(operators_dir)
+            #     print(file_name_without_extension)
+            #     print(operators_dir + "/" + file_name)
+            #     print("************************")
+            # else:
+            #     continue
+            #     # print("---------------------------------")
+            #     # print(operators_dir)
+            #     # print(file_name_without_extension)
+            #     # print("---------------------------------")
+            class_names = get_class_name(operators_dir + "/" + file_name)
+            # print(file_name_without_extension)
+            for class_name in class_names:
                 import_path = operator.module + "." + operator.sub_module + "." + file_name_without_extension
                 operator_lists.append(
                     {
-                        "id": f"{file_name_without_extension}_{import_path}",
+                        "id": f"{file_name_without_extension}_{import_path}_{class_name}",
                         "name": class_name,
                         "import_path": import_path,
                     }
