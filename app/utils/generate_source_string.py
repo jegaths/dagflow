@@ -13,6 +13,7 @@ class GenerateSourceString:
     # TODO: Render arguments based on the datatype. Example: If the argument is integer render it without quotes
     async def __generate_operator_statements(self, operators: dict, dag_variable_name: str) -> list:
         no_quotes_args = ["python_callable", "op_kwargs"]
+        no_quotes_args_type = ["int","bool"]
         args = {}
         for operator in list(set([operators[key]["name"] for key in operators])):
             temp_args = await get_operator_details(operator, projection={"args": 1})
@@ -33,7 +34,7 @@ class GenerateSourceString:
                     operator_args_str += (
                         f"""{k} = {v},"""
                         # if k == "python_callable"
-                        if k in no_quotes_args or arg_type == "int"
+                        if k in no_quotes_args or arg_type in no_quotes_args_type
                         else f"""{k} = '{v}',"""
                     )
             operator_args_str += f"""dag = {dag_variable_name})\n"""

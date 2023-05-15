@@ -217,3 +217,4 @@ sample_ast.py
 test.py
 generated_dag.py
 mongodb_data
+airflow
