@@ -37,3 +37,35 @@ You will be greated with the homepage directly where you have the option to crea
 
 .. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/homepage.png
    :alt: dagflow homepage
+
+Once you opt for creating a new dagflow or importing an existing dagflow you will be taken to the editor page where you can drag and drop different operators fill the details, save the dagflow, generate the dag etc.
+
+.. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/editor.png
+   :alt: dagflow editor
+
+Operator Lists
+^^^^^^^^^^^^^^
+Once you are in editor page you can see a canvas with a list of operators. You can drag and drop the operators to the canvas and start building your dagflow.
+
+Dagflow details
+^^^^^^^^^^^^^^^
+As you can see there are multiple tabs at the bottom of the page which contains different information about the dagflow. The tabs are explained below.
+1. General - Contains the pipeline name (dag file name) and a global field which contains the global variables,functions, codes which can be used across the dagflow or dag.
+
+.. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/general_tab.png
+   :alt: dagflow general tab
+
+2. Node Details - Contains all the arguments for that particular node(operaotr). The arguments are different for different operators and some arguments are mandatory and some are optional. All the mandatory arguments are marked as requierd and a validation is done while saving the dagflow.
+
+.. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/node_details_tab.png
+   :alt: dagflow node details tab
+
+3. Dag Details - Contains the dag details like dag name, schedule interval, start date, end date, catchup etc.
+
+.. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/dag_details_tab.png
+   :alt: dagflow dag details tab
+
+4. Imports - Contains the list of imports which are required for the dagflow. The imports are automatically generated based on the operators used in the dagflow. You can also add additional imports if required.
+
+.. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/imports_tab.png
+   :alt: dagflow imports tab
