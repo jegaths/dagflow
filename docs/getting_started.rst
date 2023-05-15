@@ -26,7 +26,7 @@ Execute the below commands to start dagflow application
    # If you want to run dagflow and airflow
    docker compose -f docker-compose.yml -f docker-compose-airflow.yml up -d
    #If you only want to run dagflow
-    docker compose up -d
+   docker compose up -d
 
 Project
 -------
