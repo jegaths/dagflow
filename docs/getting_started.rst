@@ -40,6 +40,11 @@ You will be greated with the homepage directly where you have the option to crea
 
 Once you opt for creating a new dagflow or importing an existing dagflow you will be taken to the editor page where you can drag and drop different operators fill the details, save the dagflow, generate the dag etc.
 
+If you are importing a dag file for the first time, it will generate all the operators which is mentioned in the dag file and place it in the canvas. You can then edit the dagflow as per your requirement.
+
+.. note::
+   For the first time the positions of the operators will be random. You can rearrange the operators as per your requirement and save the dagflow. The positions of the operators will be saved and the next time you open the dagflow the operators will be placed in the same position. Also before importing the dagfile make sure that all the operators in the dagfile is installed in the dagflow environment as well.
+
 .. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/editor.png
    :alt: dagflow editor
 
@@ -50,22 +55,34 @@ Once you are in editor page you can see a canvas with a list of operators. You c
 Dagflow details
 ^^^^^^^^^^^^^^^
 As you can see there are multiple tabs at the bottom of the page which contains different information about the dagflow. The tabs are explained below.
-1. General - Contains the pipeline name (dag file name) and a global field which contains the global variables,functions, codes which can be used across the dagflow or dag.
+1. **General** - Contains the pipeline name (dag file name) and a global field which contains the global variables,functions, codes which can be used across the dagflow or dag.
 
 .. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/general_tab.png
    :alt: dagflow general tab
 
-2. Node Details - Contains all the arguments for that particular node(operaotr). The arguments are different for different operators and some arguments are mandatory and some are optional. All the mandatory arguments are marked as requierd and a validation is done while saving the dagflow.
+2. **Node Details** - Contains all the arguments for that particular node(operaotr). The arguments are different for different operators and some arguments are mandatory and some are optional. All the mandatory arguments are marked as requierd and a validation is done while saving the dagflow.
 
 .. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/node_details_tab.png
    :alt: dagflow node details tab
 
-3. Dag Details - Contains the dag details like dag name, schedule interval, start date, end date, catchup etc.
+3. **Dag Details** - Contains the dag details like dag name, schedule interval, start date, end date, catchup etc.
 
 .. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/dag_details_tab.png
    :alt: dagflow dag details tab
 
-4. Imports - Contains the list of imports which are required for the dagflow. The imports are automatically generated based on the operators used in the dagflow. You can also add additional imports if required.
+4. **Imports** - Contains the list of imports which are required for the dagflow. The imports are automatically generated based on the operators used in the dagflow. You can also add additional imports if required.
 
 .. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/imports_tab.png
    :alt: dagflow imports tab
+
+Saving a dagflow
+----------------
+Once you are done with the dagflow you can save the dagflow by clicking the save button at the top right corner of the page. Once the dagflow is saved you can see the dagflow in the homepage recents and sidebar. We are using mongodb to save the dagflow projects.
+
+Generating a dag
+----------------
+When you are ready, you can generate the dag by clicking the generate button at the top right corner of the page. The generated dag will be placed on to the dags folder inside the directory mentioned in the env file (*AIRFLOW_PROJ_DIR*). The dag will be generated with the name of the dagflow project name.
+
+Deleting a dagflow
+------------------
+You can delete a dagflow by clicking the delete button at the top right corner of the canvas. This will delete the dagflow from the database but the generated dag will still be present in the dags folder. You can delete the dag manually if required.

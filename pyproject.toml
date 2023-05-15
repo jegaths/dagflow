@@ -1,0 +1,4 @@
+[project]
+name = "dagflow"
+authors = [{name = "Jegath S", email = "jegathsuresh26@gmail.com"}]
+dynamic = ["version", "description"]
