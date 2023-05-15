@@ -31,9 +31,9 @@ Execute the below commands to start dagflow application
 Project
 -------
 
-Once the application is up and running you can access the dagflow application using the below url
+Once the application is up and running you can access the dagflow application using url **http://localhost**
 
-.. code-block:: bash
-    http://localhost
+You will be greated with the homepage directly where you have the option to create a new dagflow or import an existing dag to dagflow. You can also see the list of the recent dagflows.
 
-
+.. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/homepage.png
+   :alt: dagflow homepage
