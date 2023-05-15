@@ -11,7 +11,6 @@ Here you will find all the information about Dagflow project.
 
 Contents
 --------
-
 .. toctree::
    getting_started
    architecture

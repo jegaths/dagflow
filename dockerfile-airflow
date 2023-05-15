@@ -8,3 +8,7 @@ RUN echo "$(echo $PYTHON_VERSION | cut -d '.' -f 1,2)" > version.txt
 RUN VERSION_MAJOR_MINOR=$(cat version.txt) \
     && pip install "apache-airflow[postgres,google]==${AIRFLOW_VERSION}" --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-$VERSION_MAJOR_MINOR.txt"
 RUN pip install plyvel
+
+COPY ./app/requirements.txt ./requirements.txt
+
+RUN pip install -r ./requirements.txt
