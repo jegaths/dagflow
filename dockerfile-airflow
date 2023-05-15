@@ -1,4 +1,10 @@
-FROM apache/airflow:2.5.3-python3.10
+ARG AIRFLOW_VERSION
+ARG PYTHON_VERSION
 
-ADD ./app/airflow-requirements.txt ./requirements.txt 
-RUN pip install -r requirements.txt
+FROM apache/airflow:${AIRFLOW_VERSION}-python${PYTHON_VERSION}
+
+RUN echo "$(echo $PYTHON_VERSION | cut -d '.' -f 1,2)" > version.txt
+
+RUN VERSION_MAJOR_MINOR=$(cat version.txt) \
+    && echo pip install "apache-airflow[postgres,google]==${AIRFLOW_VERSION}" --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${VERSION_MAJOR_MINOR}.txt"
+RUN pip install plyvel

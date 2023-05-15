@@ -10,12 +10,19 @@ services:
     volumes:
       - ./mongodb_data:/data/db
   app:
-    build: ./app
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      args:
+        - AIRFLOW_VERSION=${AIRFLOW_VERSION}
+        - CUSTOM_PYTHON_VERSION=${PYTHON_VERSION}
     command: uvicorn main:app --host 0.0.00 --port 8000 --reload
     volumes:
       - ${AIRFLOW_PROJ_DIR}/dags:/dags
       # - /home/jegath/Documents/docker-airflow-2.1.4/dags:/dags
       - ./app:/app
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     depends_on:
