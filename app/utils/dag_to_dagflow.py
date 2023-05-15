@@ -184,12 +184,12 @@ class DagToDagFlow:
             # operator_details
             operator_name = item["value"]["func"]["id"]
             if operator_name not in operators_details:
-                operator = await get_operator_details(operator_name=operator_name, projection={"args": 1, "path": 1})
+                operator = await get_operator_details(operator_name=operator_name, projection={"args": 1, "import_path": 1})
                 operators_details[operator_name] = operator
 
             self.__operators[item["targets"][0]["id"]] = {
                 "name": item["value"]["func"]["id"],
-                "import_path": operators_details[operator_name]["path"],
+                "import_path": operators_details[operator_name]["import_path"],
                 "args": __generate_args(item["value"]["keywords"], operators_details[operator_name]["args"]),
                 "description": "",
             }
