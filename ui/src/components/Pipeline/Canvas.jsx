@@ -59,7 +59,7 @@ const Canvas = () => {
     });
   });
 
-  const onDrop = useCallback((event) => {
+  const onDrop = useCallback((event, _setPipelineData, _setSelectedNodeId) => {
     event.preventDefault();
 
     const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
@@ -84,8 +84,6 @@ const Canvas = () => {
       data: id,
     };
 
-    setNodes((nds) => nds.concat(newNode));
-
     // On drop, add new node to pipeline.operators
     // setPipelineData
     let args = {};
@@ -100,7 +98,7 @@ const Canvas = () => {
       args: args,
       description: "Description about this node.",
     };
-    setPipelineData({
+    _setPipelineData({
       ...pipelineData,
       operators: {
         ...pipelineData.operators,
@@ -114,7 +112,9 @@ const Canvas = () => {
       setImportStatement((oldString) => `${oldString}\n${importStament}`);
     }
 
-    setSelectedNodeId(id);
+    _setSelectedNodeId(id);
+
+    setNodes((nds) => nds.concat(newNode));
   });
 
   const handleDeletePipeline = () => {
@@ -128,7 +128,7 @@ const Canvas = () => {
       <div className="flex flex-row">
         <ReactFlowProvider>
           <div className="reactflow-wrapper w-full h-full" style={{ height: "82vh", width: "100%" }} ref={reactFlowWrapper}>
-            <ReactFlow onNodesDelete={onNodeDelete} nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} onInit={setReactFlowInstance} onDrop={onDrop} onDragOver={onDragOver} nodeTypes={nodeTypes} onSelectionChange={(nodes, edges) => setSelectionChange(nodes, edges)} selectNodesOnDrag fitView>
+            <ReactFlow onNodesDelete={onNodeDelete} nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} onInit={setReactFlowInstance} onDrop={(e) => onDrop(e, setPipelineData, setSelectedNodeId)} onDragOver={onDragOver} nodeTypes={nodeTypes} onSelectionChange={(nodes, edges) => setSelectionChange(nodes, edges)} selectNodesOnDrag fitView>
               <Background className="bg-secondaryLight" variant="dots" size={3} gap={40} />
               <Controls showInteractive={false} position="top-right">
                 <ControlButton>

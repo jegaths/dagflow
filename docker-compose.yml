@@ -13,7 +13,8 @@ services:
     build: ./app
     command: uvicorn main:app --host 0.0.00 --port 8000 --reload
     volumes:
-      - /home/jegath/Documents/docker-airflow-2.1.4/dags:/dags
+      - ${AIRFLOW_PROJ_DIR}/dags:/dags
+      # - /home/jegath/Documents/docker-airflow-2.1.4/dags:/dags
       - ./app:/app
     ports:
       - "8000:8000"
