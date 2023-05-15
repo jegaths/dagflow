@@ -1,5 +1,6 @@
 # 
-FROM python:3.11.2
+# FROM python:3.11.2
+FROM python:3.10
 
 # 
 WORKDIR /app
@@ -10,6 +11,10 @@ COPY ./requirements.txt /app/requirements.txt
 # 
 RUN pip install --upgrade -r /app/requirements.txt
 # RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+
+COPY ./airflow_dependencies.sh /app/airflow_dependencies.sh
+
+RUN sh /app/airflow_dependencies.sh
 
 # 
 COPY . /app
