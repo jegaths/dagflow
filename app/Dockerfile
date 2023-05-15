@@ -4,14 +4,12 @@ FROM python:${CUSTOM_PYTHON_VERSION}
 ARG AIRFLOW_VERSION
 ARG PYTHON_VERSION
 RUN echo ${AIRFLOW_VERSION} ${PYTHON_VERSION}
-RUN echo "$(echo $PYTHON_VERSION | cut -d '.' -f 1,2)" > version
+RUN echo "$(echo $PYTHON_VERSION | cut -d '.' -f 1,2)" > version.txt
 
-RUN VERSION_MAJOR_MINOR=$(cat version) \
-    && echo "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${VERSION_MAJOR_MINOR}.txt"
+RUN VERSION_MAJOR_MINOR=$(cat version.txt) \
+    && pip install "apache-airflow[postgres,google]==${AIRFLOW_VERSION}" --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-$VERSION_MAJOR_MINOR.txt"
 
-
-# RUN pip install "apache-airflow[postgres,google]==${AIRFLOW_VERSION}" --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-$(cat version.txt).txt"
-# RUN pip install plyvel
+RUN pip install plyvel
 
 WORKDIR /app
 

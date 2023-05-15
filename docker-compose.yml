@@ -27,3 +27,12 @@ services:
       - "8000:8000"
     depends_on:
       - mongodb
+  react:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./react-app:/app
+    command: nginx -g 'daemon off;'
