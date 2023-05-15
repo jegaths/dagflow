@@ -126,6 +126,7 @@ const Details = () => {
                     isRequierd = item["args"][arg]["required"];
                     datatype = item["args"][arg]["data_type"];
                   }
+                  if (arg == "op_kwargs" || arg == "op_args") return <FloatingEditor key={key} label={arg} arg_name={arg} className="mt-4 mb-4 text-primary" data={pipelineData.operators[selectedNodeId]["args"][arg]} onchange={handleArgsChange} height={"20vh"} />;
                   return <FloatingLabelInput key={key} label={arg} className="mt-4 mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["args"][arg]} onchange={handleArgsChange} required={isRequierd} type={datatype == "int" ? "number" : "text"} />;
                 })}
 
