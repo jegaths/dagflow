@@ -76,13 +76,13 @@ As you can see there are multiple tabs at the bottom of the page which contains 
    :alt: dagflow imports tab
 
 Saving a dagflow
-----------------
+^^^^^^^^^^^^^^^^
 Once you are done with the dagflow you can save the dagflow by clicking the save button at the top right corner of the page. Once the dagflow is saved you can see the dagflow in the homepage recents and sidebar. We are using mongodb to save the dagflow projects.
 
 Generating a dag
-----------------
+^^^^^^^^^^^^^^^^
 When you are ready, you can generate the dag by clicking the generate button at the top right corner of the page. The generated dag will be placed on to the dags folder inside the directory mentioned in the env file (*AIRFLOW_PROJ_DIR*). The dag will be generated with the name of the dagflow project name.
 
 Deleting a dagflow
-------------------
+^^^^^^^^^^^^^^^^^^
 You can delete a dagflow by clicking the delete button at the top right corner of the canvas. This will delete the dagflow from the database but the generated dag will still be present in the dags folder. You can delete the dag manually if required.
