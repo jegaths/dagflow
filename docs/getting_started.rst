@@ -9,14 +9,17 @@ Setup
 -----
 
 Dagflow can be run easily using the docker. The only requirement is to have docker and docker-compose installed on the system.
-The docker-compose file is already present in the repository. We just need to clone the repository and run the docker-compose.
-If you already have a airflow environment you don't have to start the airflow container from here. Airflow and python versions are mentioned in the .env file, if needed you can change it and build the image.
+You can find the docker-compose file in the repostiory.
+If you already have an airflow environment you don't have to start the airflow container from here. Airflow and python versions are mentioned in the .env file, if needed you can change it and build the image.
 
 Providers
 ---------
-The “Core” of Apache Airflow provides core scheduler functionality which allow you to write some basic tasks, but the capabilities of Apache Airflow can be extended by installing additional packages, called providers. Installing additional providers can be done in two ways:
+The “Core” of Apache Airflow provides core scheduler functionality which allows you to write some basic tasks, but the capabilities of Apache Airflow can be extended by installing additional packages, called providers. Installing additional providers can be done in two ways:
+
 1. Adding the providers in the requirements.txt file and rebuilding the image.
+
 2. Adding the provider names inside docker-airflow and ./app/Dockerfile in the airflow installation command *apache-airflow[postgres,google]*. (Adding the providers here will be limited and we recommend to add the providers in the requirements.txt file)
+
 
 Execute the below commands to start dagflow application
 
@@ -32,9 +35,9 @@ Execute the below commands to start dagflow application
 Project
 -------
 
-Once the application is up and running you can access the dagflow application using url **http://localhost**
+Once the application is up and running, you can access the dagflow application using url **http://localhost**
 
-You will be greated with the homepage directly where you have the option to create a new dagflow or import an existing dag to dagflow. You can also see the list of the recent dagflows.
+You will be greeted with the homepage directly where you have the option to create a new dagflow or import an existing dag to dagflow. You can also see the list of the recent dagflows.
 
 .. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/homepage.png
    :alt: dagflow homepage
@@ -44,14 +47,14 @@ Once you opt for creating a new dagflow or importing an existing dagflow you wil
 If you are importing a dag file for the first time, it will generate all the operators which is mentioned in the dag file and place it in the canvas. You can then edit the dagflow as per your requirement.
 
 .. note::
-   For the first time the positions of the operators will be random. You can rearrange the operators as per your requirement and save the dagflow. The positions of the operators will be saved and the next time you open the dagflow the operators will be placed in the same position. Also before importing the dagfile make sure that all the operators in the dagfile is installed in the dagflow environment as well.
+   For the first time the positions of the operators will be random. You can rearrange the operators as per your requirement and save the dagflow. The positions of the operators will be saved and the next time you open the dagflow the operators will be placed in the same position. Also, before importing the dagfile make sure that all the operators in the dagfile is installed in the dagflow environment as well.
 
 .. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/editor.png
    :alt: dagflow editor
 
 Operator Lists
 ^^^^^^^^^^^^^^
-Once you are in editor page you can see a canvas with a list of operators. You can drag and drop the operators to the canvas and start building your dagflow.
+Once you are in the editor page, you can see a canvas with a list of operators. You can drag and drop the operators to the canvas and start building your dagflow.
 
 Dagflow details
 ^^^^^^^^^^^^^^^
@@ -61,7 +64,7 @@ As you can see there are multiple tabs at the bottom of the page which contains 
 .. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/general_tab.png
    :alt: dagflow general tab
 
-2. **Node Details** - Contains all the arguments for that particular node(operaotr). The arguments are different for different operators and some arguments are mandatory and some are optional. All the mandatory arguments are marked as requierd and a validation is done while saving the dagflow.
+2. **Node Details** - Contains all the arguments for that particular node(operator). The arguments are different for different operators and some arguments are mandatory and some are optional. All the mandatory arguments are marked as required and a validation is done while saving the dagflow.
 
 .. image:: https://raw.githubusercontent.com/jegaths/dagflow/main/docs/images/node_details_tab.png
    :alt: dagflow node details tab
