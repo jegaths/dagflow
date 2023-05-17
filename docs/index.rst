@@ -5,6 +5,15 @@ Welcome to Dagflow documentation!
 and the front-end application is in ReactJs. Dagflow provides a simple and intuitive drag and drop UI to create dag and manage the dags. Dagflow can create new dags from the UI or can **import existing** dag files to dagflow UI.
 Here you will find all the information about Dagflow project.
 
+Roadmap
+^^^^^^^
+
+- Custom operator creation
+- View dag erros from the dagflow UI (Experimental)
+- Fix bugs and test operators
+
+
+
 .. note::
 
    This project is under active development and currently in alpha state.
