@@ -1,4 +1,5 @@
 from utils.operators import get_operator_details
+import json
 
 
 class GenerateSourceString:
@@ -12,8 +13,8 @@ class GenerateSourceString:
 
     # TODO: Render arguments based on the datatype. Example: If the argument is integer render it without quotes
     async def __generate_operator_statements(self, operators: dict, dag_variable_name: str) -> list:
-        no_quotes_args = ["python_callable", "op_kwargs"]
-        no_quotes_args_type = ["int","bool"]
+        no_quotes_args = ["python_callable", "op_kwargs", "kwargs", "op_args", "args"]
+        no_quotes_args_type = ["int", "bool"]
         args = {}
         for operator in list(set([operators[key]["name"] for key in operators])):
             temp_args = await get_operator_details(operator, projection={"args": 1})
@@ -31,6 +32,10 @@ class GenerateSourceString:
                         if args[f'{operator["name"]}'].get(f"{k}", None) != None
                         else "string"
                     )
+                    if (k == "kwargs"):
+                        v_dict = json.loads(v)
+                        operator_args_str += ", ".join([f'{x} = "{y}"' for x, y in v_dict.items()] + [""])
+                        continue
                     operator_args_str += (
                         f"""{k} = {v},"""
                         # if k == "python_callable"
