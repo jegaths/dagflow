@@ -29,7 +29,8 @@ def get_default_args_v2(func) -> dict[str, Args]:
     sig = inspect.signature(func)
     res = {}
     for param in sig.parameters.values():
-        if param.name in ["self", "args", "kwargs"]:
+        # if param.name in ["self", "args", "kwargs"]:
+        if param.name in ["self"]:
             continue
         temp = Args(**{})
         if param.default is not inspect.Parameter.empty:
@@ -59,7 +60,7 @@ def generate_operators(operator: Operator) -> tuple[Operator, bool]:
         operator.args = {**operator.args, **operator_info}
         status = True
     except ModuleNotFoundError:
-        #TODO Some valid operators are getting ModuleNotFoundError, need to check why
+        # TODO Some valid operators are getting ModuleNotFoundError, need to check why
         print(f"ModuleNotFoundError => {operator.name}")
     return operator, status
 
