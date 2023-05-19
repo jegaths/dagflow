@@ -15,6 +15,13 @@ const Details = () => {
     const setFormRef = useSetRecoilState(formRefState);
     const ref = useRef();
 
+    const floatingEditorLanguage = {
+        "arg": "python",
+        "kwargs": "json",
+        "op_args": "python",
+        "op_kwargs": "json",
+    }
+
     useEffect(() => {
         setFormRef(ref.current);
     }, [ref]);
@@ -126,7 +133,7 @@ const Details = () => {
                                         isRequierd = item["args"][arg]["required"];
                                         datatype = item["args"][arg]["data_type"];
                                     }
-                                    if (arg == "op_kwargs" || arg == "op_args" || arg == "kwargs" || arg == "args") return <FloatingEditor key={key} label={arg} arg_name={arg} className="mt-4 mb-4 text-primary" data={pipelineData.operators[selectedNodeId]["args"][arg]} onchange={handleArgsChange} height={"20vh"} />;
+                                    if (arg == "op_kwargs" || arg == "op_args" || arg == "kwargs" || arg == "args") return <FloatingEditor key={key} label={arg} arg_name={arg} language={floatingEditorLanguage[arg]} className="mt-4 mb-4 text-primary" data={pipelineData.operators[selectedNodeId]["args"][arg]} onchange={handleArgsChange} height={"20vh"} />;
                                     return <FloatingLabelInput key={key} label={arg} className="mt-4 mb-4 text-primary" value={pipelineData.operators[selectedNodeId]["args"][arg]} onchange={handleArgsChange} required={isRequierd} type={datatype == "int" ? "number" : "text"} />;
                                 })}
 
