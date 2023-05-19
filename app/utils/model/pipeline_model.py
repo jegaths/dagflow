@@ -59,7 +59,7 @@ class DagStatement(BaseModel):
         schema_extra = {
             "example": {
                 "dag_variable_name": "dag",
-                "call": 'DAG(\n"my_dag_id",\ndefault_args={\n"owner": "Jegath S",\n"depends_on_past": True,\n"start_date": days_ago(1),\n"email": ["myemail.com"],\n"email_on_failure": False,\n"email_on_retry": False,\n"retries": 3,\n"retry_delay": timedelta(minutes=5),\n},\ndescription="Dagflow dag descroption",\nschedule_interval="0 0 * * *",\nconcurrency=10,\n)',
+                "call": 'DAG(\n"my_dag_id",\ndefault_args={\n"owner": "Jegath S",\n"depends_on_past": True,\n"start_date": days_ago(1),\n"email": ["myemail.com"],\n"email_on_failure": False,\n"email_on_retry": False,\n"retries": 3,\n"retry_delay": timedelta(minutes=5),\n},\ndescription="Dagflow dag description",\nschedule_interval="0 0 * * *",\nconcurrency=10,\n)',
             }
         }
 
@@ -91,7 +91,7 @@ class PipelineData(BaseModel):
                 "import_statements": "from airflow import DAG",
                 "dag_statement": {
                     "dag_variable_name": "dag",
-                    "call": 'DAG(\n"my_dag_id",\ndefault_args={\n"owner": "Jegath S",\n"depends_on_past": True,\n"start_date": days_ago(1),\n"email": ["myemail.com"],\n"email_on_failure": False,\n"email_on_retry": False,\n"retries": 3,\n"retry_delay": timedelta(minutes=5),\n},\ndescription="Dagflow dag descroption",\nschedule_interval="0 0 * * *",\nconcurrency=10,\n)',
+                    "call": 'DAG(\n"my_dag_id",\ndefault_args={\n"owner": "Jegath S",\n"depends_on_past": True,\n"start_date": days_ago(1),\n"email": ["myemail.com"],\n"email_on_failure": False,\n"email_on_retry": False,\n"retries": 3,\n"retry_delay": timedelta(minutes=5),\n},\ndescription="Dagflow dag description",\nschedule_interval="0 0 * * *",\nconcurrency=10,\n)',
                 },
             }
         }
