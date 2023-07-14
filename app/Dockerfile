@@ -1,8 +1,8 @@
-ARG CUSTOM_PYTHON_VERSION
+ARG CUSTOM_PYTHON_VERSION=3.10
 FROM python:${CUSTOM_PYTHON_VERSION}
 
-ARG AIRFLOW_VERSION
-ARG PYTHON_VERSION
+ARG AIRFLOW_VERSION=2.5.3
+ARG PYTHON_VERSION=3.10
 RUN echo ${AIRFLOW_VERSION} ${PYTHON_VERSION}
 RUN echo "$(echo $PYTHON_VERSION | cut -d '.' -f 1,2)" > version.txt
 
@@ -13,9 +13,12 @@ RUN pip install plyvel
 
 WORKDIR /app
 
+RUN pip install pyroscope-io
+
 COPY ./requirements.txt /app/requirements.txt
 
 RUN pip install -r /app/requirements.txt
+
 
 COPY . /app
 

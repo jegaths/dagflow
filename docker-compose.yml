@@ -2,6 +2,18 @@
 version: "3.8"
 
 services:
+  pyroscope:
+    image: pyroscope/pyroscope
+    # volumes:
+      # - ./pyroscope-data:/var/lib/pyroscope
+      # - ./pyroscope-config.yml:/etc/pyroscope/server.yml
+    environment:
+      - PYROSCOPE_LOG_LEVEL=debug
+    ports:
+      - '4040:4040'
+    command:
+      - 'server'
+
   mongodb:
     image: mongo:6.0
     restart: always
@@ -23,6 +35,13 @@ services:
       - ./app:/app
     env_file:
       - .env
+    # environment:
+    #   - AIRFLOW_UID=1000
+    #   - AIRFLOW_GID=0
+    #   - AIRFLOW_PROJ_DIR=./airflow
+    #   - AIRFLOW_VERSION=2.5.3
+    #   - PYTHON_VERSION=3.10
+
     ports:
       - "8000:8000"
     depends_on:

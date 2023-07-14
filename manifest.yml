@@ -1,0 +1,191 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: my-app
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pyroscope
+  namespace: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pyroscope
+  template:
+    metadata:
+      labels:
+        app: pyroscope
+    spec:
+      containers:
+        - name: pyroscope
+          image: pyroscope/pyroscope
+          imagePullPolicy: Never
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/pyroscope/server.yml
+          env:
+            - name: PYROSCOPE_LOG_LEVEL
+              value: "debug"
+          ports:
+            - containerPort: 4040
+      volumes:
+        - name: config-volume
+          configMap:
+            name: pyroscope-config
+            items:
+              - key: server.yml
+                path: server.yml
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pyroscope-config
+  namespace: my-app
+data:
+  server.yml: |
+    # Add your pyroscope server configuration here
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  namespace: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:6.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongodb-data
+              mountPath: /data/db
+      volumes:
+        - name: mongodb-data
+          emptyDir: {}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  namespace: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - name: app
+          image: dagflow-app
+          command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: airflow-proj-dir
+              mountPath: /dags
+            - name: app-volume
+              mountPath: /app
+          env:
+            - name: AIRFLOW_UID
+              value: "1000"
+            - name: AIRFLOW_GID
+              value: "0"
+            - name: AIRFLOW_PROJ_DIR
+              value: "./airflow"
+            - name: AIRFLOW_VERSION
+              value: "2.5.3"
+            - name: PYTHON_VERSION
+              value: "3.10"
+      volumes:
+        - name: airflow-proj-dir
+          hostPath:
+            path: ./dags
+        - name: app-volume
+          emptyDir: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  namespace: my-app
+spec:
+  selector:
+    app: app
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react
+  namespace: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: react
+  template:
+    metadata:
+      labels:
+        app: react
+    spec:
+      containers:
+        - name: react
+          image: dagflow-react
+          imagePullPolicy: Never
+          command: ["nginx", "-g", "daemon off;"]
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: ui-volume
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: ui-volume
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: react
+  namespace: my-app
+spec:
+  selector:
+    app: react
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
